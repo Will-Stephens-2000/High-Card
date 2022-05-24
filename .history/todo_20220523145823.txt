@@ -1,0 +1,26 @@
+Create player class (card, money)
+
+highCard game:
+    card comparison
+    betting
+    win conditions
+
+    highCard might return the player which wins
+
+    modes for pvp, pvc, cvc
+
+implement baseline strategy
+
+implement neural net which dictates actions
+
+implement tournament style match for bots to play eachother
+
+
+train
+
+???
+
+profit
+
+
+figure out how to upload to github
