@@ -7,7 +7,7 @@ BIG_BLIND_AMOUNT = 20
 def playHighCard(player1, player2):
     turn = 1
     bigBlindPosition = 1
-    pot = 0
+
     while player1.getMoney() > 0 and player2.getMoney() > 0: # loop until a player wins
         resetPot(pot, player1, player2)
         dealCard(player1)
