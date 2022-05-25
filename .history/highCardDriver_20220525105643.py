@@ -7,18 +7,17 @@ BIG_BLIND_AMOUNT = 20
 def playHighCard(player1, player2):
     turn = 1
     bigBlindPosition = 1
-    pot = 0
+
     while player1.getMoney() > 0 and player2.getMoney() > 0: # loop until a player wins
-        resetPot(pot, player1, player2)
+        pot = 0
+
         dealCard(player1)
         dealCard(player2)
 
         if bigBlindPosition == 1:
             turn = 2
             pot += insertBlind(player1, BIG_BLIND_AMOUNT)
-            player1.setMoneyInPot(BIG_BLIND_AMOUNT)
             neededBetToCall = BIG_BLIND_AMOUNT
-
             playerAction = (None, None)
             while playerAction[0] != "Fold" and playerAction[0] != "Call": # loop until someone calls or folds
                 if turn == 1:
@@ -40,19 +39,14 @@ def playHighCard(player1, player2):
                         print("Fold. Player 2 Wins: ", pot)
                         player2.setMoney(player2.getMoney() + pot)
 
-                    resetPot(pot, player1, player2)
+                    pot = 0
                     bigBlindPosition = 2
                     continue
 
                 elif playerAction[0] == "Call": 
                     print("Call: ", playerAction[1])
                     pot += playerAction[1]
-                    
-                    if (player1.getMoneyInPot() - player2.getMoneyInPot() > 0.00000001):
-                        print ("Player1 pot: ", player1.getMoneyInPot())
-                        print ("Player2 pot: ", player2.getMoneyInPot())
-                        raise Exception("Error: players have not inputted equal amounts into the pot")
-                        
+
                     print("Player 1: ", player1.getCardOne().getRank())
                     print("Player 2: ", player2.getCardOne().getRank())
 
@@ -71,23 +65,18 @@ def playHighCard(player1, player2):
                     else:
                         raise Exception("card comparision failed.")
                     
-                    resetPot(pot, player1, player2)
+                    pot = 0
                     bigBlindPosition = 2
                     continue
 
                 elif playerAction[0] == "Raise":
                     print("Raise: ", playerAction[1])
                     pot += playerAction[1]
-                    
-                    if turn == 1: # player 2 just raised, so get player one's money in pot
-                        neededBetToCall = player2.getMoneyInPot() - player1.getMoneyInPot()
-                    else:
-                        neededBetToCall = player1.getMoneyInPot() - player2.getMoneyInPot()
-                
+                    neededBetToCall = pot - playerAction[1]
                 else:
                     raise Exception("The player has made an unkonwn action")    
         
-        else: # player2 is big blind
+        else:
             turn = 1
             pot += insertBlind(player2, BIG_BLIND_AMOUNT)
             neededBetToCall = BIG_BLIND_AMOUNT
@@ -101,7 +90,7 @@ def playHighCard(player1, player2):
                     turn = 1
 
 
-                # a player has folded, so the other gets the pot.
+                # the a player has folded, so the other gets the pot.
                 # We've already changed turn above, so just check which turn,
                 # payout, and reset.
                 if playerAction[0] == "Fold": 
@@ -112,18 +101,13 @@ def playHighCard(player1, player2):
                         print("Fold. Player 2 Wins: ", pot)
                         player2.setMoney(player2.getMoney() + pot)
 
-                    resetPot(pot, player1, player2)
+                    pot = 0
                     bigBlindPosition = 1
                     continue
 
                 elif playerAction[0] == "Call": 
                     print("Call: ", playerAction[1])
                     pot += playerAction[1]
-
-                    if (player1.getMoneyInPot() - player2.getMoneyInPot() > 0.00000001):
-                        print ("Player1 put in: ", player1.getMoneyInPot())
-                        print ("Player2 put in: ", player2.getMoneyInPot())
-                        raise Exception("Error: players have not inputted equal amounts into the pot")
 
                     print("Player 1: ", player1.getCardOne().getRank())
                     print("Player 2: ", player2.getCardOne().getRank())
@@ -143,26 +127,17 @@ def playHighCard(player1, player2):
                     else:
                         raise Exception("card comparision failed.")
                     
-                    resetPot(pot, player1, player2)
+                    pot = 0
                     bigBlindPosition = 1
                     continue
 
                 elif playerAction[0] == "Raise":
                     print("Raise: ", playerAction[1])
                     pot += playerAction[1]
-                    
-                    if turn == 1: # player 2 just raised, so get player one's money in pot
-                        neededBetToCall = player2.getMoneyInPot() - player1.getMoneyInPot()
-                    else:
-                        neededBetToCall = player1.getMoneyInPot() - player2.getMoneyInPot()
+                    neededBetToCall = pot - playerAction[1]
                 else:
                     raise Exception("The player has made an unkonwn action")                    
-
-
-def resetPot(pot, player1, player2):
-    pot = 0
-    player1.setMoneyInPot(0)
-    player2.setMoneyInPot(0)
+            
 
 
 # Method which subtracts the big blind from the player's balance.
@@ -204,11 +179,9 @@ def action(decidingPlayer, otherPlayer, currentBet):
             if decidingPlayer.getMoney() < currentBet:
                 # if the bet is 20 and deciding player has 13, the bet becomes 13 and other player is refunded 20 - 13 = 7
                 otherPlayer.setMoney(otherPlayer.getMoney() + (currentBet - decidingPlayer.getMoney()))
-                otherPlayer.setMoneyInPot(otherPlayer.getMoneyInPot() - (currentBet - decidingPlayer.getMoney()))
                 return ("Call", decidingPlayer.getMoney())
             
             decidingPlayer.setMoney(decidingPlayer.getMoney() - currentBet)
-            decidingPlayer.setMoneyInPot(decidingPlayer.getMoneyInPot() + currentBet)
             return ("Call", currentBet)
 
 
@@ -225,12 +198,10 @@ def action(decidingPlayer, otherPlayer, currentBet):
                         Raising for", decidingPlayer.getMoney(), "instead.")
                 raiseAmount = decidingPlayer.getMoney()
                 decidingPlayer.setMoney(0)
-                decidingPlayer.setMoneyInPot(decidingPlayer.getMoneyInPot() + raiseAmount)
                 return ("Raise", raiseAmount)
 
                     
             decidingPlayer.setMoney(decidingPlayer.getMoney() - raiseAmount)
-            decidingPlayer.setMoneyInPot(decidingPlayer.getMoneyInPot() + raiseAmount)
             return ("Raise", raiseAmount)
         
         elif playerAction == "Fold" or playerAction == "fold" \
