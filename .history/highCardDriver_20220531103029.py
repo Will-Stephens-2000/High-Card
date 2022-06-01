@@ -9,8 +9,7 @@ def playHighCard(player1, player2):
     bigBlindPosition = 1
     pot = 0
     while player1.getMoney() > 0 and player2.getMoney() > 0: # loop until a player wins
-        pot = 0
-        resetPot(player1, player2)
+        resetPot(pot, player1, player2)
         dealCard(player1)
         dealCard(player2)
 
@@ -42,8 +41,7 @@ def playHighCard(player1, player2):
                         print("Fold. Player 2 Wins: ", pot)
                         player2.setMoney(player2.getMoney() + pot)
 
-                    pot = 0
-                    resetPot(player1, player2)
+                    resetPot(pot, player1, player2)
                     bigBlindPosition = 2
                     continue
 
@@ -74,8 +72,7 @@ def playHighCard(player1, player2):
                     else:
                         raise Exception("card comparision failed.")
                     
-                    pot = 0
-                    resetPot(player1, player2)
+                    resetPot(pot, player1, player2)
                     bigBlindPosition = 2
                     continue
 
@@ -117,8 +114,7 @@ def playHighCard(player1, player2):
                         print("Fold. Player 2 Wins: ", pot)
                         player2.setMoney(player2.getMoney() + pot)
 
-                    pot = 0
-                    resetPot(player1, player2)
+                    resetPot(pot, player1, player2)
                     bigBlindPosition = 1
                     continue
 
@@ -149,8 +145,7 @@ def playHighCard(player1, player2):
                     else:
                         raise Exception("card comparision failed.")
                     
-                    pot = 0
-                    resetPot(player1, player2)
+                    resetPot(pot, player1, player2)
                     bigBlindPosition = 1
                     continue
 
@@ -166,7 +161,8 @@ def playHighCard(player1, player2):
                     raise Exception("The player has made an unkonwn action")                    
 
 
-def resetPot(player1, player2):
+def resetPot(pot, player1, player2):
+    pot = 0
     player1.setMoneyInPot(0)
     player2.setMoneyInPot(0)
 
