@@ -36,6 +36,8 @@ class Player:
         return "Card1: " + self.getCardOne().toString() + \
                 " Card2: "+ self.getCardTwo().toString() + \
                 " Money: "+ str(self.getMoney())
+
+
 # Method which deals a card to a player.
 def dealCard(player):
     card = getRandomCard()
