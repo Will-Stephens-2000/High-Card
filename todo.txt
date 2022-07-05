@@ -1,8 +1,8 @@
 #Create player class (card, money)
 
 highCard game:
-    card comparison
-    betting
+#    card comparison
+#    betting
     win conditions
 
     highCard might return the player which wins
