@@ -1,8 +1,8 @@
-Create player class (card, money)
+#Create player class (card, money)
 
 highCard game:
-    card comparison
-    betting
+#    card comparison
+#    betting
     win conditions
 
     highCard might return the player which wins
@@ -18,7 +18,7 @@ implement tournament style match for bots to play eachother
 
 train
 
-?
+???
 
 profit
 

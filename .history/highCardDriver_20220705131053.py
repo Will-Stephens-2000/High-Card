@@ -9,10 +9,12 @@ def playHighCard(player1, player2):
     bigBlindPosition = 1
     pot = 0
     while player1.getMoney() > 0 and player2.getMoney() > 0: # loop until a player wins
-        resetPot(pot, player1, player2)
+        pot = 0
+        resetPot(player1, player2)
         dealCard(player1)
         dealCard(player2)
 
+        print("\nNew Hand:\n")
         if bigBlindPosition == 1:
             turn = 2
             pot += insertBlind(player1, BIG_BLIND_AMOUNT)
@@ -40,7 +42,8 @@ def playHighCard(player1, player2):
                         print("Fold. Player 2 Wins: ", pot)
                         player2.setMoney(player2.getMoney() + pot)
 
-                    resetPot(pot, player1, player2)
+                    pot = 0
+                    resetPot(player1, player2)
                     bigBlindPosition = 2
                     continue
 
@@ -71,7 +74,8 @@ def playHighCard(player1, player2):
                     else:
                         raise Exception("card comparision failed.")
                     
-                    resetPot(pot, player1, player2)
+                    pot = 0
+                    resetPot(player1, player2)
                     bigBlindPosition = 2
                     continue
 
@@ -90,6 +94,7 @@ def playHighCard(player1, player2):
         else: # player2 is big blind
             turn = 1
             pot += insertBlind(player2, BIG_BLIND_AMOUNT)
+            player2.setMoneyInPot(BIG_BLIND_AMOUNT)
             neededBetToCall = BIG_BLIND_AMOUNT
             playerAction = (None, None)
             while playerAction[0] != "Fold" and playerAction[0] != "Call": # loop until someone calls or folds
@@ -112,7 +117,8 @@ def playHighCard(player1, player2):
                         print("Fold. Player 2 Wins: ", pot)
                         player2.setMoney(player2.getMoney() + pot)
 
-                    resetPot(pot, player1, player2)
+                    pot = 0
+                    resetPot(player1, player2)
                     bigBlindPosition = 1
                     continue
 
@@ -143,7 +149,8 @@ def playHighCard(player1, player2):
                     else:
                         raise Exception("card comparision failed.")
                     
-                    resetPot(pot, player1, player2)
+                    pot = 0
+                    resetPot(player1, player2)
                     bigBlindPosition = 1
                     continue
 
@@ -159,8 +166,7 @@ def playHighCard(player1, player2):
                     raise Exception("The player has made an unkonwn action")                    
 
 
-def resetPot(pot, player1, player2):
-    pot = 0
+def resetPot(player1, player2):
     player1.setMoneyInPot(0)
     player2.setMoneyInPot(0)
 
@@ -188,7 +194,7 @@ def insertBlind(player, amount):
 # shove can be a faster way to raise all in, would still count as a raise
 def action(decidingPlayer, otherPlayer, currentBet):
     print ("Your Card:", decidingPlayer.getCardOne().toString())
-    print ("The current bet is ", currentBet)
+    print ("Amount needed to call: ", currentBet)
     print ("Your chips: ", decidingPlayer.getMoney())
     print ("Opponent's chips: ", otherPlayer.getMoney())
     playerAction = None
@@ -218,7 +224,9 @@ def action(decidingPlayer, otherPlayer, currentBet):
         elif playerAction == "Raise" or playerAction == "raise" \
                 or playerAction == "r" or playerAction == "R":
             
-            raiseAmount = int(input("How much would you like to raise:"))
+            raiseAmount = int(input("How much would you like to raise: (-1 to go back): "))
+            
+
             while (raiseAmount < currentBet * 2):
                 print ("Raise amount must be at least 2x the current bet.")
                 raiseAmount = int(input("How much would you like to raise:"))

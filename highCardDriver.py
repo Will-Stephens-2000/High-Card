@@ -194,7 +194,7 @@ def insertBlind(player, amount):
 # shove can be a faster way to raise all in, would still count as a raise
 def action(decidingPlayer, otherPlayer, currentBet):
     print ("Your Card:", decidingPlayer.getCardOne().toString())
-    print ("The current bet is ", currentBet)
+    print ("Amount needed to call: ", currentBet)
     print ("Your chips: ", decidingPlayer.getMoney())
     print ("Opponent's chips: ", otherPlayer.getMoney())
     playerAction = None
@@ -214,6 +214,9 @@ def action(decidingPlayer, otherPlayer, currentBet):
                 otherPlayer.setMoneyInPot(otherPlayer.getMoneyInPot() - 
                     (currentBet - decidingPlayer.getMoney()))
                 
+                decidingPlayer.setMoneyInPot(decidingPlayer.getMoneyInPot() + decidingPlayer.getMoney())
+                decidingPlayer.setMoney(0)
+                
                 return ("Call", decidingPlayer.getMoney())
             
             decidingPlayer.setMoney(decidingPlayer.getMoney() - currentBet)
@@ -224,7 +227,9 @@ def action(decidingPlayer, otherPlayer, currentBet):
         elif playerAction == "Raise" or playerAction == "raise" \
                 or playerAction == "r" or playerAction == "R":
             
-            raiseAmount = int(input("How much would you like to raise:"))
+            raiseAmount = int(input("How much would you like to raise: (-1 to go back): "))
+            
+
             while (raiseAmount < currentBet * 2):
                 print ("Raise amount must be at least 2x the current bet.")
                 raiseAmount = int(input("How much would you like to raise:"))
