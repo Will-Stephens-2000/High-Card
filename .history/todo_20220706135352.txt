@@ -37,7 +37,3 @@ Stuff to think about:
     How do I handle bet amounts for output
         What do I do if it wants to bet more than it has
     
-
-big blind inflation:
-    double big blind after x hands
-    create logic if player has fewer chips than bigblind

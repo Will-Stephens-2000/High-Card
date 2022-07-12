@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from Card import *
 
-NUM_INPUTS = 14
+NUM_INPUTS = 16
 NUM_HIDDEN = 100
 NUM_OUTPUTS = 5
 #device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -36,7 +36,7 @@ class NeuralNetwork(nn.Module):
 # this method activates the node which cooresponds to the current
 # card rank and returns a tensor as such.
 # This method does not currently take into account the nodes for betSize and chipSize
-def createInputs(card, betSize, myChips):
+def createInputs(card, betSize, myChips, oppChips):
     inputs = np.zeros(NUM_INPUTS)
 
     rank = int(convertRank(card.getRank()))
@@ -45,8 +45,9 @@ def createInputs(card, betSize, myChips):
     #inputs[12] => rank = 14 = A 
     inputs[rank-2] = 1
 
-    total = myChips + betSize
-    inputs[13] = min(betSize/myChips, 1)
-    #inputs[14] = min(ch)
-
+    total = myChips + oppChips + betSize
+    inputs[13] = betSize / total
+    inputs[14] = myChips / total
+    inputs[15] = oppChips / total
+    
     return torch.from_numpy(inputs)

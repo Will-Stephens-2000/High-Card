@@ -40,8 +40,6 @@ class Player:
                 " Card2: "+ self.getCardTwo().toString() + \
                 " Money: "+ str(self.getMoney())
 
-    def getNeuralNet(self):
-        return self.neuralNet
 
 # Method which deals a card to a player.
 def dealCard(player):

@@ -1,0 +1,31 @@
+#Create player class (card, money)
+
+highCard game:
+#    card comparison
+#    betting
+    win conditions
+
+    highCard might return the player which wins
+
+    modes for pvp, pvc, cvc
+
+implement baseline strategy
+
+implement neural net which dictates actions
+
+implement tournament style match for bots to play eachother
+
+
+train
+
+???
+
+profit
+
+
+Activation for currChips and opponent's chips:
+    map ratio of currentChips/initialChips into .5x. 
+
+
+Activation for currentBet:
+    activation is just ratio of min(currentbet/currentChips, 1)
