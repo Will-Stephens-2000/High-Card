@@ -164,6 +164,11 @@ def playHighCard(player1, player2):
                         neededBetToCall = player1.getMoneyInPot() - player2.getMoneyInPot()
                 else:
                     raise Exception("The player has made an unkonwn action")                    
+    
+    if player1.getMoney() > 0:
+        return player1
+    else:
+        return player2
 
 
 def resetPot(player1, player2):
@@ -213,6 +218,9 @@ def action(decidingPlayer, otherPlayer, currentBet):
                     (currentBet - decidingPlayer.getMoney()))
                 otherPlayer.setMoneyInPot(otherPlayer.getMoneyInPot() - 
                     (currentBet - decidingPlayer.getMoney()))
+                
+                decidingPlayer.setMoneyInPot(decidingPlayer.getMoneyInPot() + decidingPlayer.getMoney())
+                decidingPlayer.setMoney(0)
                 
                 return ("Call", decidingPlayer.getMoney())
             

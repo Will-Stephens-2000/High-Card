@@ -3,6 +3,8 @@ from Player import *
 
 
 SMALL_BLIND_AMOUNT = 20
+TURNS_FOR_BLIND_INCREASE = 5
+
 
 def playHighCard(player1, player2):
     turn = 1
@@ -164,6 +166,11 @@ def playHighCard(player1, player2):
                         neededBetToCall = player1.getMoneyInPot() - player2.getMoneyInPot()
                 else:
                     raise Exception("The player has made an unkonwn action")                    
+    
+    if player1.getMoney() > 0:
+        return player1
+    else:
+        return player2
 
 
 def resetPot(player1, player2):
@@ -182,9 +189,11 @@ def insertBlind(player, amount):
     if player.getMoney() < amount:
         moneyLeft = player.getMoney()
         player.setMoney(0)
+        player.setMoneyInPot(moneyLeft)
         return moneyLeft
 
     player.setMoney(player.getMoney() - amount)
+    player.setMoneyInPot(amount)
     return amount
     
 
@@ -213,6 +222,9 @@ def action(decidingPlayer, otherPlayer, currentBet):
                     (currentBet - decidingPlayer.getMoney()))
                 otherPlayer.setMoneyInPot(otherPlayer.getMoneyInPot() - 
                     (currentBet - decidingPlayer.getMoney()))
+                
+                decidingPlayer.setMoneyInPot(decidingPlayer.getMoneyInPot() + decidingPlayer.getMoney())
+                decidingPlayer.setMoney(0)
                 
                 return ("Call", decidingPlayer.getMoney())
             
@@ -252,6 +264,84 @@ def action(decidingPlayer, otherPlayer, currentBet):
             print("Invalid action: please Call, Raise, or Fold")
 
 
+# A version of highCard for computer vs computer.
+# We will call this method to get the outcome of each match of neural nets.
+
+# player1 and player2 are Player objects
+# 
+def playHighCardCvC(player1, player2):
+    turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
+    blindMultiplier = 1
+    player1Big = True
+
+    bigBlind = SMALL_BLIND_AMOUNT * blindMultiplier
+
+    while(player1.getMoney() > 0 and player2.getMoney() > 0):
+        if turnsUntilBlind == 0:
+            blindMultiplier *= 2
+            turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
+
+        bigBlind = SMALL_BLIND_AMOUNT * blindMultiplier
+
+        #
+        if player1Big:
+            playHand(player2, player1, bigBlind)
+            player1Big = False
+        else:
+            playHand(player1, player2, bigBlind)
+            player1Big = True
+
+
+        turnsUntilBlind -= 1
+
+
+    if player1.getMoney() > 0 :
+        return player1
+    else:
+        return player2
+
+
+# smallBlind and bigBlind are player objects
+# blindAmount is the smallBlind amount
+def playHand(smallBlind, bigBlind, blindAmount):
+    
+    dealCard(smallBlind)
+    dealCard(bigBlind)
+    pot = 0
+    
+    # small blind player has less than small blind amount, so just have poorest player
+    #   shove and the other matches. No betting since one player has shoved.
+    if smallBlind.getMoney() <= blindAmount:
+        chipsIn = min(smallBlind.getMoney(), bigBlind.getMoney())
+        pot += insertBlind(smallBlind, chipsIn)
+        pot += insertBlind(bigBlind, chipsIn)
+
+        winner = getWinner(smallBlind, bigBlind)
+
+        if winner == 0:
+            pot -= chipsIn
+            awardMoney(smallBlind, chipsIn)
+
+            pot -= chipsIn
+            awardMoney(bigBlind, chipsIn)
+
+    elif bigBlind.getMoney() <= 2 * blindAmount:
+        return -1
+    else:
+        pot += insertBlind(smallBlind, blindAmount)
+        pot += insertBlind(bigBlind, 2 * blindAmount)
+
+        # action = 0 => smallBlind's action and action = 1 => bigBlind's action
+        # action = -1 => someone called or folded
+        action = 0
+
+        while action != -1:
+            if action == 0: # smallBlind's turn
+                
+            else: # bigBlind's turn
+
+        return 0
+
 def validAction(action):
     validActions = ["Call", "call", "c", "C", "Raise", "raise", "r", "R", "Fold", "fold", "f", "Fold"]
 
@@ -261,8 +351,24 @@ def validAction(action):
     return False
 
 
+def getWinner(player1, player2):
+    result = player1.getCardOne().compareRankTo(player2.getCardOne())
 
+    # tie
+    if result == 0:
+        return 0
 
+    # player 1 wins
+    elif result == -1:
+        return 1
+    
+    #player 2 wins
+    else:
+        return 2
+
+def awardMoney(player, amount):
+    player.setMoney(player.getMoney() + amount)
+    player.setMoneyInPot(0)
 
 def main():
     player1 = Player(None, None, 1000)

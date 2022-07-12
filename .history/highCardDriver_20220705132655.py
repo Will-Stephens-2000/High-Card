@@ -2,7 +2,7 @@ from Card import *
 from Player import *
 
 
-BIG_BLIND_AMOUNT = 20
+SMALL_BLIND_AMOUNT = 20
 
 def playHighCard(player1, player2):
     turn = 1
@@ -17,9 +17,9 @@ def playHighCard(player1, player2):
         print("\nNew Hand:\n")
         if bigBlindPosition == 1:
             turn = 2
-            pot += insertBlind(player1, BIG_BLIND_AMOUNT)
-            player1.setMoneyInPot(BIG_BLIND_AMOUNT)
-            neededBetToCall = BIG_BLIND_AMOUNT
+            pot += insertBlind(player1, SMALL_BLIND_AMOUNT)
+            player1.setMoneyInPot(SMALL_BLIND_AMOUNT)
+            neededBetToCall = SMALL_BLIND_AMOUNT
 
             playerAction = (None, None)
             while playerAction[0] != "Fold" and playerAction[0] != "Call": # loop until someone calls or folds
@@ -93,9 +93,9 @@ def playHighCard(player1, player2):
         
         else: # player2 is big blind
             turn = 1
-            pot += insertBlind(player2, BIG_BLIND_AMOUNT)
-            player2.setMoneyInPot(BIG_BLIND_AMOUNT)
-            neededBetToCall = BIG_BLIND_AMOUNT
+            pot += insertBlind(player2, SMALL_BLIND_AMOUNT)
+            player2.setMoneyInPot(SMALL_BLIND_AMOUNT)
+            neededBetToCall = SMALL_BLIND_AMOUNT
             playerAction = (None, None)
             while playerAction[0] != "Fold" and playerAction[0] != "Call": # loop until someone calls or folds
                 if turn == 1:
