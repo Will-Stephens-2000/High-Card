@@ -91,7 +91,7 @@ def playHighCard(player1, player2):
                         neededBetToCall = player1.getMoneyInPot() - player2.getMoneyInPot()
                 
                 else:
-                    raise Exception("The player has made an unkonwn action")    
+                    raise Exception("The player has made an unknown action")    
         
         else: # player2 is big blind
             turn = 1
@@ -335,12 +335,59 @@ def playHand(smallBlind, bigBlind, blindAmount):
         # action = -1 => someone called or folded
         action = 0
         betSize = 2 * blindAmount
+        smallBlindWin = False
+        bigBlindWin = False
         while action != -1:
             if action == 0: # smallBlind's turn
-                decision = botAction(smallBlind, betSize)
+                decisions = botAction(smallBlind, betSize)
+                myDecision = getFirstValidAction(smallBlind, decisions, betSize)
+
+                if myDecision[0] == "Fold":
+                    bigBlindWin = True
+                    break
+                elif myDecision[0] == "Call":
+                    pot += betSize
+                    smallBlind.setMoneyInPot(smallBlind.getMoney() + betSize)
+                    break
             else: # bigBlind's turn
-                decision = botAction(bigBlind, betSize)
+                decisions = botAction(bigBlind, betSize)
+                myDecision = getFirstValidAction(bigBlind, decisions, betSize)
+
+                if myDecision[0] == "Fold":
+                    smallBlindWin = True
+                    break
+                elif myDecision[0] == "Call":
+                    # this only occurs if bigBlind can't afford the betsize, so refund smallBlind the remaining money
+                    if myDecision[1] < betSize:
+
+                    pot += myDecision[1]
+                    bigBlind.setMoneyInPot(bigBlind.getMoney() + myDecision[1])
+                    break
+                elif myDecision[0] == "Raise":
+                    raiseAmount = myDecision[1]
+
+        if smallBlind.getMoneyInPot() - bigBlind.getMoneyInPot() > 0.000000001:
+            raise Exception("Players have not inserted equal amounts into the pot:",
+             "smallBlind: ", smallBlind.getMoneyInPot(), " bigBlind: ", bigBlind.getMoneyInPot())
+
+        if smallBlindWin:
+            awardMoney(smallBlind, pot)
+        elif bigBlindWin:
+            awardMoney(bigBlind, pot)
+        else:
+            winner = getWinner(smallBlind, bigBlind)
+
+            if winner == 0:
+                awardMoney(smallBlind, pot/2)
+                awardMoney(bigBlind, pot/2)
+            elif winner == 1:
+                awardMoney(smallBlind, pot)
+            else:
+                awardMoney(bigBlind, pot)
+
+        resetPot(smallBlind, bigBlind)
         return 0
+
 
 def validAction(action):
     validActions = ["Call", "call", "c", "C", "Raise", "raise", "r", "R", "Fold", "fold", "f", "Fold"]
@@ -376,13 +423,43 @@ def botAction(player, betSize):
     model = player.getNeuralNet().to()
     logits = model(inputs)
     possibleActions = nn.Softmax(dim=1)(logits)
+    
     return possibleActions
+
+
+def getFirstValidAction(player, actions, betSize):
+    for i in range(1, len(actions)+1):
+        possibleAction = actions.argmax(i)
+
+        if possibleAction == 0: # fold
+            return ("Fold", 0)
+        
+        elif possibleAction == 1: #call
+            if player.getMoney() < betSize:
+                return ("Call", player.getMoney())            
+            return ("Call", betSize)
+        
+        elif possibleAction == 2: #minRaise
+            if player.getMoney() < 2 * betSize:
+                continue
+            return ("Raise", betSize * 2)
+        elif possibleAction == 3: # higherRaise
+            if player.getMoney() < 5 * betSize:
+                continue
+            return ("Raise", 5 * betSize)
+        else: # shove            
+            return ("Shove", player.getMoney())
+    
+    raise Exception("All actions were invalid.")                    
+
+
+
+
 
 def main():
     player1 = Player(None, None, 1000)
     player2 = Player(None, None, 1000)
     playHighCard(player1, player2)
-
 
 
 

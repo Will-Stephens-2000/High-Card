@@ -337,9 +337,9 @@ def playHand(smallBlind, bigBlind, blindAmount):
         betSize = 2 * blindAmount
         while action != -1:
             if action == 0: # smallBlind's turn
-                decision = getAction(smallBlind, betSize)
+                decision = botAction(smallBlind, betSize)
             else: # bigBlind's turn
-                decision = getAction(bigBlind, betSize)
+                decision = botAction(bigBlind, betSize)
         return 0
 
 def validAction(action):
@@ -370,7 +370,7 @@ def awardMoney(player, amount):
     player.setMoney(player.getMoney() + amount)
     player.setMoneyInPot(0)
 
-def getAction(player, betSize):
+def botAction(player, betSize):
     inputs = createInputs(player.getCardOne(), betSize)
 
     model = player.getNeuralNet().to()
