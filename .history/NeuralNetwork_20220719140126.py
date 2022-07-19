@@ -6,7 +6,7 @@ from Card import *
 from Player import *
 
 NUM_INPUTS = 15 # 13 card ranks plus currBet and myChips as input
-NUM_HIDDEN = 15 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
+NUM_HIDDEN = 15
 NUM_OUTPUTS = 5 # 5 outputs: fold, call minRaise, higherRaise, shove
 
 
@@ -103,7 +103,6 @@ def randomMutation(weightDict, mutStr, mutChance):
         finalDict[key] = mutatedTensor
     
     return finalDict
-
 # this method activates the node which cooresponds to the current
 # card rank, activates nodes reflective of the current bet size 
 # and the player's current chips and returns a tensor reflecting the activations.
