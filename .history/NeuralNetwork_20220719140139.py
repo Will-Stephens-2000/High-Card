@@ -6,7 +6,7 @@ from Card import *
 from Player import *
 
 NUM_INPUTS = 15 # 13 card ranks plus currBet and myChips as input
-NUM_HIDDEN = 15 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
+NUM_HIDDEN = 15
 NUM_OUTPUTS = 5 # 5 outputs: fold, call minRaise, higherRaise, shove
 
 
