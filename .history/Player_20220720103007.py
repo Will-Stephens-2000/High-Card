@@ -27,7 +27,7 @@ class Player:
     def incrementWins(self):
         self.numWins += 1
 
-
+        
     def getCardOne(self):
         return self.card1
     
@@ -44,7 +44,9 @@ class Player:
         return self.numWins
 
     def toString(self):
-        return "Wins: ", self.numWins
+        return "Card1: " + self.getCardOne().toString() + \
+                " Card2: "+ self.getCardTwo().toString() + \
+                " Money: "+ str(self.getMoney())
 
     def getNeuralNet(self):
         return self.neuralNet

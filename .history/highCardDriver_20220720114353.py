@@ -460,12 +460,9 @@ def botAction(player, betSize):
 
 
 def getFirstValidAction(player, actions, betSize):
-    listActions = list(actions)
     sortedActions = list(sorted(actions, reverse=True))
-    print(listActions)
-    print(sortedActions)
-    for i in range(0, len(actions)):
-        possibleAction = listActions.index(sortedActions[i])
+    for i in range(1, len(actions)+1):
+        possibleAction = actions.index(sortedActions[i])
 
         if possibleAction == 0: # fold
             return ("Fold", 0)

@@ -369,7 +369,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
             else: # bigBlind's turn
                 decisions = botAction(bigBlind, betSize)
                 myDecision = getFirstValidAction(bigBlind, decisions, betSize)
-                print(myDecision[0])
+
                 if myDecision[0] == "Fold":
                     smallBlindWin = True
                     break
@@ -449,23 +449,18 @@ def awardMoney(player, amount):
     player.setMoneyInPot(0)
 
 def botAction(player, betSize):
-    inputs = createInputs(player.getCardOne(), betSize, player.getMoney())
-    #print(type(inputs))
-    
-    model = player.getNeuralNet()
-    logits = model(inputs.float())
+    inputs = createInputs(player.getCardOne(), betSize)
+
+    model = player.getNeuralNet().to("cpu")
+    logits = model(inputs)
     possibleActions = nn.Softmax(dim=1)(logits)
     
     return possibleActions
 
 
 def getFirstValidAction(player, actions, betSize):
-    listActions = list(actions)
-    sortedActions = list(sorted(actions, reverse=True))
-    print(listActions)
-    print(sortedActions)
-    for i in range(0, len(actions)):
-        possibleAction = listActions.index(sortedActions[i])
+    for i in range(1, len(actions)+1):
+        possibleAction = actions.argmax(i)
 
         if possibleAction == 0: # fold
             return ("Fold", 0)
@@ -491,37 +486,13 @@ def getFirstValidAction(player, actions, betSize):
     raise Exception("All actions were invalid.")                    
 
 
-# Plays a Round Robin bracket for each neural net.
-# Tracks the number of wins for each neural net.
-# Returns a list of neural nets sorted from most to least winning nets.
-#
-# neuralNets is a list of neuralNets
-# returns a list of neuralNets sorted from most to least number of wins.
-def playTournament(players):
-    for i in range(len (players) - 1):
-        for j in range(i+1, len(players)):
-            player1 = players[i]
-            player2 = players[j]
-
-            winner = playHighCardCvC(player1, player2)
-
-            winner.incrementWins()
-
-    return sorted(players, key = lambda x:x.numWins, reverse=True)
 
 
 
-NUM_PLAYERS = 10
 def main():
-    gen1Players = [None] * NUM_PLAYERS
-
-    for i in range(NUM_PLAYERS):
-        gen1Players[i] = Player(None, None, STARTING_CASH, NeuralNetwork().to("cpu"))
-
-    winners = playTournament(gen1Players)
-
-    for i in range(NUM_PLAYERS):
-        print(winners[i].toString())
+    player1 = Player(None, None, STARTING_CASH)
+    player2 = Player(None, None, STARTING_CASH)
+    playHighCard(player1, player2)
 
 
 

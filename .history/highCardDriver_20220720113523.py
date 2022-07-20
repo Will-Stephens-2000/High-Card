@@ -369,7 +369,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
             else: # bigBlind's turn
                 decisions = botAction(bigBlind, betSize)
                 myDecision = getFirstValidAction(bigBlind, decisions, betSize)
-                print(myDecision[0])
+
                 if myDecision[0] == "Fold":
                     smallBlindWin = True
                     break
@@ -451,21 +451,18 @@ def awardMoney(player, amount):
 def botAction(player, betSize):
     inputs = createInputs(player.getCardOne(), betSize, player.getMoney())
     #print(type(inputs))
-    
+    for input in inputs:
+        print(type(input))
     model = player.getNeuralNet()
-    logits = model(inputs.float())
+    logits = model(inputs)
     possibleActions = nn.Softmax(dim=1)(logits)
     
     return possibleActions
 
 
 def getFirstValidAction(player, actions, betSize):
-    listActions = list(actions)
-    sortedActions = list(sorted(actions, reverse=True))
-    print(listActions)
-    print(sortedActions)
-    for i in range(0, len(actions)):
-        possibleAction = listActions.index(sortedActions[i])
+    for i in range(1, len(actions)+1):
+        possibleAction = actions.argmax(i)
 
         if possibleAction == 0: # fold
             return ("Fold", 0)

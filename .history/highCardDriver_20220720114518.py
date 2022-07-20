@@ -463,7 +463,6 @@ def getFirstValidAction(player, actions, betSize):
     listActions = list(actions)
     sortedActions = list(sorted(actions, reverse=True))
     print(listActions)
-    print(sortedActions)
     for i in range(0, len(actions)):
         possibleAction = listActions.index(sortedActions[i])
 

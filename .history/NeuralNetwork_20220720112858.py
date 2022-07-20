@@ -114,7 +114,7 @@ def createInputs(card, betSize, myChips):
     
     #inputs[0] => rank = 2
     #inputs[12] => rank = 14 = A 
-    inputs[0][rank-2] = float(1.)
+    inputs[0][rank-2] = 1.
 
     #total = float(myChips + betSize)
     inputs[0][13] = min(float(betSize/myChips), 1.) # current bet
