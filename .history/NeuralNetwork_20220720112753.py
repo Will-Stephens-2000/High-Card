@@ -114,11 +114,11 @@ def createInputs(card, betSize, myChips):
     
     #inputs[0] => rank = 2
     #inputs[12] => rank = 14 = A 
-    inputs[0][rank-2] = float(1.)
+    inputs[rank-2] = 1.
 
     #total = float(myChips + betSize)
-    inputs[0][13] = min(float(betSize/myChips), 1.) # current bet
-    inputs[0][14] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
+    inputs[13] = min(float(betSize/myChips), 1.) # current bet
+    inputs[14] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
 
     print(inputs)
     return torch.from_numpy(inputs)

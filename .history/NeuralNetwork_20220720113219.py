@@ -120,5 +120,7 @@ def createInputs(card, betSize, myChips):
     inputs[0][13] = min(float(betSize/myChips), 1.) # current bet
     inputs[0][14] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
 
+    print(type(inputs[0][13]))
+    print(type(inputs[0][14]))
     print(inputs)
     return torch.from_numpy(inputs)

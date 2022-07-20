@@ -465,7 +465,7 @@ def getFirstValidAction(player, actions, betSize):
     print(listActions)
     print(sortedActions)
     for i in range(0, len(actions)):
-        possibleAction = listActions.index(sortedActions[i])
+        possibleAction = listActions.index(sortedActions[][i])
 
         if possibleAction == 0: # fold
             return ("Fold", 0)

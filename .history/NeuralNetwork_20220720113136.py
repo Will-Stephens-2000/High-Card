@@ -111,7 +111,8 @@ def createInputs(card, betSize, myChips):
     inputs = np.zeros((1, NUM_INPUTS))
 
     rank = int(convertRank(card.getRank()))
-    
+    print(type(inputs[0][0]))
+    print(type(inputs[0][1]))
     #inputs[0] => rank = 2
     #inputs[12] => rank = 14 = A 
     inputs[0][rank-2] = float(1.)

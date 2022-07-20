@@ -6,7 +6,7 @@ from Card import *
 from Player import *
 
 NUM_INPUTS = 15 # 13 card ranks plus currBet and myChips as input
-NUM_HIDDEN = 15 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
+NUM_HIDDEN = 100 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
 NUM_OUTPUTS = 5 # 5 outputs: fold, call minRaise, higherRaise, shove
 
 
@@ -108,17 +108,17 @@ def randomMutation(weightDict, mutStr, mutChance):
 # card rank, activates nodes reflective of the current bet size 
 # and the player's current chips and returns a tensor reflecting the activations.
 def createInputs(card, betSize, myChips):
-    inputs = np.zeros((1, NUM_INPUTS))
+    inputs = np.zeros(NUM_INPUTS)
 
     rank = int(convertRank(card.getRank()))
     
     #inputs[0] => rank = 2
     #inputs[12] => rank = 14 = A 
-    inputs[0][rank-2] = float(1.)
+    inputs[rank-2] = 1.
 
     #total = float(myChips + betSize)
-    inputs[0][13] = min(float(betSize/myChips), 1.) # current bet
-    inputs[0][14] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
+    inputs[13] = min(float(betSize/myChips), 1.) # current bet
+    inputs[14] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
 
     print(inputs)
     return torch.from_numpy(inputs)
