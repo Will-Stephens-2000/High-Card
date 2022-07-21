@@ -562,7 +562,7 @@ def getFirstValidAction(player, actions, betSize):
                 continue
             return ("Raise", 5 * betSize)
         else: # shove: put all remaining chips into the pot: if money < betSize: counts as call          
-            if player.getMoney() <= betSize:
+            if player.getMoney() + player.getMoneyInPot() <= betSize:
                 print("shoving with less than bet")
                 return ("Special Call", player.getMoney())
             return ("Raise", player.getMoney()) 

@@ -270,7 +270,6 @@ def action(decidingPlayer, otherPlayer, currentBet):
 # player1 and player2 are Player objects
 # 
 def playHighCardCvC(player1, player2):
-    print("new game against new players")
     turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
     blindMultiplier = 1
     player1Big = True
@@ -278,7 +277,6 @@ def playHighCardCvC(player1, player2):
     bigBlind = SMALL_BLIND_AMOUNT * blindMultiplier
 
     while(player1.getMoney() > 0 and player2.getMoney() > 0):
-        print("player1 ", player1.getMoney(), " player2: ", player2.getMoney())
         if turnsUntilBlind == 0:
             blindMultiplier *= 2
             turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
@@ -287,17 +285,13 @@ def playHighCardCvC(player1, player2):
 
         #
         if player1Big:
-            result = playHand(player2, player1, bigBlind)
-            player2.setMoney(result[0])
-            player1.setMoney(result[1])
+            playHand(player2, player1, bigBlind)
             player1Big = False
         else:
-            result = playHand(player1, player2, bigBlind)
-            player1.setMoney(result[0])
-            player2.setMoney(result[1])
+            playHand(player1, player2, bigBlind)
             player1Big = True
 
-        print(result)
+
         turnsUntilBlind -= 1
 
 
@@ -314,37 +308,27 @@ def playHand(smallBlind, bigBlind, blindAmount):
     dealCard(smallBlind)
     dealCard(bigBlind)
     pot = 0
-    print("\n\nNew Hand: SB:", smallBlind.getMoney(), " BB:", bigBlind.getMoney())
-    print(blindAmount, 2 * blindAmount)
+    
     # small blind player has less than small blind amount, so just have poorest player
     #   shove and the other matches. No betting since one player has shoved.
     if smallBlind.getMoney() <= blindAmount or bigBlind.getMoney() <= 2 * blindAmount:
-        print("we have only a few chips left")
         chipsIn = min(smallBlind.getMoney(), bigBlind.getMoney())
-        
         pot += insertBlind(smallBlind, chipsIn)
         pot += insertBlind(bigBlind, chipsIn)
 
         winner = getWinner(smallBlind, bigBlind)
 
         if winner == 0:
-            print("Chop! ", pot/2)
-            awardMoney(smallBlind, pot/2)
-            awardMoney(bigBlind, pot/2)
-        elif winner == 1:
-            print("small blind wins", pot)
-            awardMoney(smallBlind, pot)
-        else:
-            print("big blind wins", pot)
-            awardMoney(bigBlind, pot)
-        
-        resetPot(smallBlind, bigBlind)
-        return (smallBlind.getMoney(), bigBlind.getMoney())
+            pot -= chipsIn
+            awardMoney(smallBlind, chipsIn)
+
+            pot -= chipsIn
+            awardMoney(bigBlind, chipsIn)
+
     else:
         pot += insertBlind(smallBlind, blindAmount)
         pot += insertBlind(bigBlind, 2 * blindAmount)
-        #print("players' money after blinds:", smallBlind.getMoney(), bigBlind.getMoney())
-        
+
         # action = 0 => smallBlind's action and action = 1 => bigBlind's action
         # action = -1 => someone called or folded
         action = 0
@@ -359,51 +343,25 @@ def playHand(smallBlind, bigBlind, blindAmount):
                 print(myDecision[0], myDecision[1], "smallBlind")
                 if myDecision[0] == "Fold":
                     bigBlindWin = True
-
                     break
                 elif myDecision[0] == "Call":
-                    # must refund
-                    callAmount = myDecision[1]
-                    print(callAmount)
+                    # this only occurs if smallBlind can't afford the betsize, so refund bigBlind the remaining money
+                    if myDecision[1] < betSize:
+                        difference = betSize - myDecision[1]
+                        bigBlind.setMoney(bigBlind.getMoney() + difference)
+                        bigBlind.setMoneyInPot(bigBlind.getMoneyInPot() - difference)
                     
-                    
-                    pot = 2 * callAmount
-                    smallBlind.setMoney(smallBlind.getMoney() - callAmount + smallBlind.getMoneyInPot())
-                    smallBlind.setMoneyInPot(callAmount)
-
-
-                    if bigBlind.getMoneyInPot() + smallBlind.getMoneyInPot() - pot > .01:
-                        raise Exception("Players have not inserted equal amounts into the pot:",
-                            "smallBlind: ", smallBlind.getMoneyInPot(), " bigBlind: ", bigBlind.getMoneyInPot(),
-                             " pot: ", pot)
-
+                    pot += myDecision[1] - smallBlind.getMoneyInPot()
+                    smallBlind.setMoneyInPot(myDecision[1])
                     break
-                
-                # small blind can not call full amount, so we refund what's necessary 
-                elif myDecision[0] == "Special Call":
-                    callAmount = myDecision[1] + smallBlind.getMoneyInPot()
-
-                    pot = 2 * callAmount
-
-                    smallBlind.setMoney(0)
-                    smallBlind.setMoneyInPot(callAmount)
-
-                    bigBlind.setMoney(bigBlind.getMoney() + bigBlind.getMoneyInPot() - callAmount)
-                    bigBlind.setMoneyInPot(callAmount)
-                    break
-
                 elif myDecision[0] == "Raise":
-                    #print(myDecision[1])
                     raiseAmount = myDecision[1]
 
                     pot += raiseAmount - smallBlind.getMoneyInPot()
-                    #print(pot)
-                    smallBlind.setMoney(smallBlind.getMoney() - raiseAmount + smallBlind.getMoneyInPot())
-                    #print(smallBlind.getMoney())
-                    betSize = raiseAmount #+ smallBlind.getMoneyInPot()
-                    #print(betSize)
+                    smallBlind.setMoney(smallBlind.getMoney() + smallBlind.getMoneyInPot() - raiseAmount)
                     smallBlind.setMoneyInPot(raiseAmount)
-                    #print(smallBlind.getMoneyInPot())
+                    
+                    betSize = raiseAmount
                     action = 1
 
             else: # bigBlind's turn
@@ -415,81 +373,55 @@ def playHand(smallBlind, bigBlind, blindAmount):
                     break
                 
                 elif myDecision[0] == "Call":
-                    callAmount = myDecision[1]
-                    print("callAmount", callAmount)
-
-                    pot = 2 * callAmount
-                    bigBlind.setMoney(bigBlind.getMoney() - callAmount + bigBlind.getMoneyInPot())
-                    bigBlind.setMoneyInPot(callAmount)
-        
-                    if bigBlind.getMoneyInPot() + smallBlind.getMoneyInPot() - pot > .01:
-                        raise Exception("Players have not inserted equal amounts into the pot:",
-                            "smallBlind: ", smallBlind.getMoneyInPot(), " bigBlind: ", bigBlind.getMoneyInPot(),
-                            " pot: ", pot)
+                    # this only occurs if bigBlind can't afford the betsize, so refund smallBlind the remaining money
+                    if myDecision[1] < betSize:
+                        difference = betSize - myDecision[1]
+                        smallBlind.setMoney(smallBlind.getMoney() + difference)
+                        smallBlind.setMoneyInPot(smallBlind.getMoneyInPot() - difference)
+                    
+                    pot += myDecision[1] - bigBlind.getMoneyInPot()
+                    bigBlind.setMoneyInPot(myDecision[1])
                     break
                 
-                # big blind can not call full amount, so we refund what's necessary 
-                elif myDecision[0] == "Special Call":
-                    callAmount = myDecision[1] + bigBlind.getMoneyInPot()
-
-                    pot = 2 * callAmount
-
-                    bigBlind.setMoney(0)
-                    bigBlind.setMoneyInPot(callAmount)
-
-                    smallBlind.setMoney(smallBlind.getMoney() + smallBlind.getMoneyInPot() - callAmount)
-                    smallBlind.setMoneyInPot(callAmount)
-                    break
-
                 elif myDecision[0] == "Raise":
                     raiseAmount = myDecision[1]
 
                     pot += raiseAmount - bigBlind.getMoneyInPot()
-                    bigBlind.setMoney(bigBlind.getMoney() - raiseAmount + bigBlind.getMoneyInPot())
-                    print (bigBlind.getMoney())
-                    betSize = raiseAmount #+ bigBlind.getMoneyInPot()
+                    bigBlind.setMoney(bigBlind.getMoney() + bigBlind.getMoneyInPot() - raiseAmount)
                     bigBlind.setMoneyInPot(raiseAmount)
-                                      
+                    
+                    betSize = raiseAmount
                     action = 0
 
 
-        # if smallBlind.getMoneyInPot() - bigBlind.getMoneyInPot() > 0.000000001:
-        #     raise Exception("Players have not inserted equal amounts into the pot:",
-        #      "smallBlind: ", smallBlind.getMoneyInPot(), " bigBlind: ", bigBlind.getMoneyInPot())
+        if smallBlind.getMoneyInPot() - bigBlind.getMoneyInPot() > 0.000000001:
+            raise Exception("Players have not inserted equal amounts into the pot:",
+             "smallBlind: ", smallBlind.getMoneyInPot(), " bigBlind: ", bigBlind.getMoneyInPot())
 
 
         if smallBlindWin:
-            print("small blind wins:", pot)
             awardMoney(smallBlind, pot)
         elif bigBlindWin:
-            print("bigBlind wins:", pot)
             awardMoney(bigBlind, pot)
         else:
             winner = getWinner(smallBlind, bigBlind)
 
             if winner == 0:
-                print("chop!", pot/2)
                 awardMoney(smallBlind, pot/2)
                 awardMoney(bigBlind, pot/2)
             elif winner == 1:
-                print("small blind wins:", pot)
                 awardMoney(smallBlind, pot)
             else:
-                print("big blind wins:", pot)
                 awardMoney(bigBlind, pot)
-        print(smallBlind.getMoney(), bigBlind.getMoney())
+
         resetPot(smallBlind, bigBlind)
-        
-        if smallBlind.getMoney() < 0 or bigBlind.getMoney() < 0:
-            raise Exception("Someone's taken out a loan somehow", smallBlind.getMoney(), bigBlind.getMoney())
-        if (smallBlind.getMoney() + bigBlind.getMoney()) > 2000.1:
+        pot = 0
+
+        if 2 * STARTING_CASH - (smallBlind.getMoney() + bigBlind.getMoney()) < .05:
             raise Exception("Infinite Money Glitch: More money is in the game than possible:",
                 "smallBlind: ", smallBlind.getMoney(), " bigBlind: ", bigBlind.getMoney())
-        if (smallBlind.getMoney() + bigBlind.getMoney()) < 1999.9:
-            raise Exception("un-Infinite Money Glitch: Less money is in the game than possible:",
-                "smallBlind: ", smallBlind.getMoney(), " bigBlind: ", bigBlind.getMoney())
-    
-    return (smallBlind.getMoney(), bigBlind.getMoney())
+
+        return 0
 
 
 def validAction(action):
@@ -532,39 +464,35 @@ def botAction(player, betSize):
 
 
 def getFirstValidAction(player, actions, betSize):
-    #print("length", len(actions[0]))
+    listActions = actions
     sortedActions = torch.sort(actions, descending=True)[1]
     #print("sortedActions: ", sortedActions)
     #print(type(sortedActions))
-    for i in range(0, len(actions[0])):
-        
+    for i in range(0, len(actions)):
+
         # I don't know why the tensor is 2d, but i needed to access
         # the first tensor in listActions, hence listActions[0][maxIndex]
-        possibleAction = sortedActions[0][i].item()
-        #print("possibleAction", possibleAction)
+        possibleAction = listActions[0][sortedActions[0][i].item()]
+
         if possibleAction == 0: # fold
-            #print("I should be folding")
             return ("Fold", 0)
         
         elif possibleAction == 1: #call
-            if player.getMoney() + player.getMoneyInPot() < betSize:
-                return ("Special Call", player.getMoney())            
+            if player.getMoney() < betSize:
+                return ("Call", player.getMoney())            
             return ("Call", betSize)
         
         elif possibleAction == 2: #minRaise: will only return if a min raise is possible
-            if player.getMoney() + player.getMoneyInPot() < 2 * betSize:
-                #print("made it to continue")
+            if player.getMoney() < 2 * betSize:
                 continue
             return ("Raise", betSize * 2)
         elif possibleAction == 3: # higherRaise: will only return if the raise amount is possible
-            if player.getMoney() + player.getMoneyInPot() < 5 * betSize:
-                #print("made it to continue")
+            if player.getMoney() < 5 * betSize:
                 continue
             return ("Raise", 5 * betSize)
         else: # shove: put all remaining chips into the pot: if money < betSize: counts as call          
             if player.getMoney() <= betSize:
-                print("shoving with less than bet")
-                return ("Special Call", player.getMoney())
+                return ("Call", player.getMoney())
             return ("Raise", player.getMoney()) 
     
     raise Exception("All actions were invalid.")                    
@@ -581,21 +509,16 @@ def playTournament(players):
         for j in range(i+1, len(players)):
             player1 = players[i]
             player2 = players[j]
-            player1.setMoney(STARTING_CASH)
-            player2.setMoney(STARTING_CASH)
 
             winner = playHighCardCvC(player1, player2)
-            
-            if winner == player1:
-                players[i].incrementWins()
-            else:
-                players[j].incrementWins()
+
+            winner.incrementWins()
 
     return sorted(players, key = lambda x:x.numWins, reverse=True)
 
 
 
-NUM_PLAYERS = 10
+NUM_PLAYERS = 100
 def main():
     gen1Players = [None] * NUM_PLAYERS
 
@@ -605,7 +528,6 @@ def main():
     winners = playTournament(gen1Players)
 
     for i in range(NUM_PLAYERS):
-        #print(winners[i].getNeuralNet().getWeights())
         print(winners[i].toString())
 
 
