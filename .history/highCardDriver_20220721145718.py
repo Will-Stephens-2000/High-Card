@@ -328,16 +328,11 @@ def playHand(smallBlind, bigBlind, blindAmount):
         winner = getWinner(smallBlind, bigBlind)
 
         if winner == 0:
-            print("Chop! ", pot/2)
-            awardMoney(smallBlind, pot/2)
-            awardMoney(bigBlind, pot/2)
-        elif winner == 1:
-            print("small blind wins", pot)
-            awardMoney(smallBlind, pot)
+            pot -= chipsIn
+            awardMoney(smallBlind, chipsIn)
         else:
-            print("big blind wins", pot)
-            awardMoney(bigBlind, pot)
-        
+            pot -= chipsIn
+            awardMoney(bigBlind, chipsIn)
         resetPot(smallBlind, bigBlind)
         return (smallBlind.getMoney(), bigBlind.getMoney())
     else:
@@ -363,14 +358,24 @@ def playHand(smallBlind, bigBlind, blindAmount):
                     break
                 elif myDecision[0] == "Call":
                     # must refund
-                    callAmount = myDecision[1]
+                    callAmount = min(bigBlind.getMoneyInPot(), smallBlind.getMoneyInPot() + smallBlind.getMoney())
                     print(callAmount)
+                    if callAmount < bigBlind.getMoneyInPot():
+                        difference = bigBlind.getMoneyInPot() - callAmount
+
+                        bigBlind.setMoneyInPot(bigBlind.getMoneyInPot() - difference)
+                        bigBlind.setMoney(bigBlind.getMoney() + difference)
                     
+                    # # this only occurs if smallBlind can't afford the betsize, so refund bigBlind the remaining money
+                    # if myDecision[1] + smallBlind.getMoneyInPot() < betSize:
+                    #     print("it's refund time")
+                    #     difference = betSize - myDecision[1]
+                    #     bigBlind.setMoney(bigBlind.getMoney() + difference)
+                    #     bigBlind.setMoneyInPot(bigBlind.getMoneyInPot() - difference)
                     
                     pot = 2 * callAmount
                     smallBlind.setMoney(smallBlind.getMoney() - callAmount + smallBlind.getMoneyInPot())
                     smallBlind.setMoneyInPot(callAmount)
-
 
                     if bigBlind.getMoneyInPot() + smallBlind.getMoneyInPot() - pot > .01:
                         raise Exception("Players have not inserted equal amounts into the pot:",
@@ -378,31 +383,17 @@ def playHand(smallBlind, bigBlind, blindAmount):
                              " pot: ", pot)
 
                     break
-                
-                # small blind can not call full amount, so we refund what's necessary 
-                elif myDecision[0] == "Special Call":
-                    callAmount = myDecision[1] + smallBlind.getMoneyInPot()
-
-                    pot = 2 * callAmount
-
-                    smallBlind.setMoney(0)
-                    smallBlind.setMoneyInPot(callAmount)
-
-                    bigBlind.setMoney(bigBlind.getMoney() + bigBlind.getMoneyInPot() - callAmount)
-                    bigBlind.setMoneyInPot(callAmount)
-                    break
-
                 elif myDecision[0] == "Raise":
                     #print(myDecision[1])
                     raiseAmount = myDecision[1]
 
-                    pot += raiseAmount - smallBlind.getMoneyInPot()
+                    pot += raiseAmount #- smallBlind.getMoneyInPot()
                     #print(pot)
                     smallBlind.setMoney(smallBlind.getMoney() - raiseAmount + smallBlind.getMoneyInPot())
                     #print(smallBlind.getMoney())
                     betSize = raiseAmount #+ smallBlind.getMoneyInPot()
                     #print(betSize)
-                    smallBlind.setMoneyInPot(raiseAmount)
+                    smallBlind.setMoneyInPot(raiseAmount + smallBlind.getMoneyInPot())
                     #print(smallBlind.getMoneyInPot())
                     action = 1
 
@@ -415,9 +406,23 @@ def playHand(smallBlind, bigBlind, blindAmount):
                     break
                 
                 elif myDecision[0] == "Call":
-                    callAmount = myDecision[1]
+                    callAmount = min(smallBlind.getMoneyInPot(), bigBlind.getMoneyInPot() + bigBlind.getMoney())
                     print("callAmount", callAmount)
 
+                    # must refund
+                    if callAmount < smallBlind.getMoneyInPot():
+                        difference = smallBlind.getMoneyInPot() - callAmount
+
+                        smallBlind.setMoneyInPot(smallBlind.getMoneyInPot() - difference)
+                        smallBlind.setMoney(smallBlind.getMoney() + difference)
+
+                    # # this only occurs if bigBlind can't afford the betsize, so refund smallBlind the remaining money
+                    # if myDecision[1] + bigBlind.getMoneyInPot() < betSize:
+                    #     print("it's refund time")
+                    #     difference = betSize - myDecision[1]
+                    #     smallBlind.setMoney(smallBlind.getMoney() + difference)
+                    #     smallBlind.setMoneyInPot(smallBlind.getMoneyInPot() - difference)
+                    
                     pot = 2 * callAmount
                     bigBlind.setMoney(bigBlind.getMoney() - callAmount + bigBlind.getMoneyInPot())
                     bigBlind.setMoneyInPot(callAmount)
@@ -428,27 +433,14 @@ def playHand(smallBlind, bigBlind, blindAmount):
                             " pot: ", pot)
                     break
                 
-                # big blind can not call full amount, so we refund what's necessary 
-                elif myDecision[0] == "Special Call":
-                    callAmount = myDecision[1] + bigBlind.getMoneyInPot()
-
-                    pot = 2 * callAmount
-
-                    bigBlind.setMoney(0)
-                    bigBlind.setMoneyInPot(callAmount)
-
-                    smallBlind.setMoney(smallBlind.getMoney() + smallBlind.getMoneyInPot() - callAmount)
-                    smallBlind.setMoneyInPot(callAmount)
-                    break
-
                 elif myDecision[0] == "Raise":
                     raiseAmount = myDecision[1]
 
-                    pot += raiseAmount - bigBlind.getMoneyInPot()
+                    pot += raiseAmount
                     bigBlind.setMoney(bigBlind.getMoney() - raiseAmount + bigBlind.getMoneyInPot())
                     print (bigBlind.getMoney())
                     betSize = raiseAmount #+ bigBlind.getMoneyInPot()
-                    bigBlind.setMoneyInPot(raiseAmount)
+                    bigBlind.setMoneyInPot(bigBlind.getMoneyInPot() + raiseAmount)
                                       
                     action = 0
 
@@ -547,8 +539,8 @@ def getFirstValidAction(player, actions, betSize):
             return ("Fold", 0)
         
         elif possibleAction == 1: #call
-            if player.getMoney() + player.getMoneyInPot() < betSize:
-                return ("Special Call", player.getMoney())            
+            # if player.getMoney() + player.getMoneyInPot() < betSize:
+            #     return ("Call", player.getMoney())            
             return ("Call", betSize)
         
         elif possibleAction == 2: #minRaise: will only return if a min raise is possible
@@ -564,7 +556,7 @@ def getFirstValidAction(player, actions, betSize):
         else: # shove: put all remaining chips into the pot: if money < betSize: counts as call          
             if player.getMoney() <= betSize:
                 print("shoving with less than bet")
-                return ("Special Call", player.getMoney())
+                return ("Call", player.getMoney())
             return ("Raise", player.getMoney()) 
     
     raise Exception("All actions were invalid.")                    

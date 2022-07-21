@@ -95,7 +95,7 @@ def randomMutation(weightDict, mutStr, mutChance):
                     newWeight = currTensor[i][j] + mutAmount
                     
                     mutatedTensor[i][j] = newWeight
-
+                    
         finalDict[key] = mutatedTensor
     
     return finalDict
@@ -113,11 +113,7 @@ def createInputs(card, betSize, myChips):
     inputs[0][rank-2] = float(1.)
 
     #total = float(myChips + betSize)
-    if myChips == 0:
-        inputs[0][13] = 1
-    else:
-        inputs[0][13] = min(float(betSize/myChips), 1.) # current bet
-    
+    inputs[0][13] = min(float(betSize/myChips), 1.) # current bet
     inputs[0][14] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
 
     #print(inputs)

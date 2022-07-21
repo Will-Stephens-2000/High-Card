@@ -328,16 +328,11 @@ def playHand(smallBlind, bigBlind, blindAmount):
         winner = getWinner(smallBlind, bigBlind)
 
         if winner == 0:
-            print("Chop! ", pot/2)
-            awardMoney(smallBlind, pot/2)
-            awardMoney(bigBlind, pot/2)
-        elif winner == 1:
-            print("small blind wins", pot)
-            awardMoney(smallBlind, pot)
+            pot -= chipsIn
+            awardMoney(smallBlind, chipsIn)
         else:
-            print("big blind wins", pot)
-            awardMoney(bigBlind, pot)
-        
+            pot -= chipsIn
+            awardMoney(bigBlind, chipsIn)
         resetPot(smallBlind, bigBlind)
         return (smallBlind.getMoney(), bigBlind.getMoney())
     else:
@@ -396,7 +391,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
                     #print(myDecision[1])
                     raiseAmount = myDecision[1]
 
-                    pot += raiseAmount - smallBlind.getMoneyInPot()
+                    pot += raiseAmount #- smallBlind.getMoneyInPot()
                     #print(pot)
                     smallBlind.setMoney(smallBlind.getMoney() - raiseAmount + smallBlind.getMoneyInPot())
                     #print(smallBlind.getMoney())
@@ -428,23 +423,12 @@ def playHand(smallBlind, bigBlind, blindAmount):
                             " pot: ", pot)
                     break
                 
-                # big blind can not call full amount, so we refund what's necessary 
                 elif myDecision[0] == "Special Call":
-                    callAmount = myDecision[1] + bigBlind.getMoneyInPot()
-
-                    pot = 2 * callAmount
-
-                    bigBlind.setMoney(0)
-                    bigBlind.setMoneyInPot(callAmount)
-
-                    smallBlind.setMoney(smallBlind.getMoney() + smallBlind.getMoneyInPot() - callAmount)
-                    smallBlind.setMoneyInPot(callAmount)
-                    break
-
+                    return -1
                 elif myDecision[0] == "Raise":
                     raiseAmount = myDecision[1]
 
-                    pot += raiseAmount - bigBlind.getMoneyInPot()
+                    pot += raiseAmount #- bigBlind.getMoneyInPot()
                     bigBlind.setMoney(bigBlind.getMoney() - raiseAmount + bigBlind.getMoneyInPot())
                     print (bigBlind.getMoney())
                     betSize = raiseAmount #+ bigBlind.getMoneyInPot()
@@ -460,10 +444,10 @@ def playHand(smallBlind, bigBlind, blindAmount):
 
         if smallBlindWin:
             print("small blind wins:", pot)
-            awardMoney(smallBlind, pot)
+            awardMoney(smallBlind, pot - blindAmount)
         elif bigBlindWin:
             print("bigBlind wins:", pot)
-            awardMoney(bigBlind, pot)
+            awardMoney(bigBlind, pot - 2 * blindAmount)
         else:
             winner = getWinner(smallBlind, bigBlind)
 
@@ -473,7 +457,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
                 awardMoney(bigBlind, pot/2)
             elif winner == 1:
                 print("small blind wins:", pot)
-                awardMoney(smallBlind, pot)
+                awardMoney(smallBlind, pot -  blindAmount)
             else:
                 print("big blind wins:", pot)
                 awardMoney(bigBlind, pot)

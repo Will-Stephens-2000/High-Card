@@ -328,16 +328,11 @@ def playHand(smallBlind, bigBlind, blindAmount):
         winner = getWinner(smallBlind, bigBlind)
 
         if winner == 0:
-            print("Chop! ", pot/2)
-            awardMoney(smallBlind, pot/2)
-            awardMoney(bigBlind, pot/2)
-        elif winner == 1:
-            print("small blind wins", pot)
-            awardMoney(smallBlind, pot)
+            pot -= chipsIn
+            awardMoney(smallBlind, chipsIn)
         else:
-            print("big blind wins", pot)
-            awardMoney(bigBlind, pot)
-        
+            pot -= chipsIn
+            awardMoney(bigBlind, chipsIn)
         resetPot(smallBlind, bigBlind)
         return (smallBlind.getMoney(), bigBlind.getMoney())
     else:
@@ -473,7 +468,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
                 awardMoney(bigBlind, pot/2)
             elif winner == 1:
                 print("small blind wins:", pot)
-                awardMoney(smallBlind, pot)
+                awardMoney(smallBlind, pot -  blindAmount)
             else:
                 print("big blind wins:", pot)
                 awardMoney(bigBlind, pot)
