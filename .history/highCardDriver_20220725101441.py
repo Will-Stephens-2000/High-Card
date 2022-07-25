@@ -270,7 +270,7 @@ def action(decidingPlayer, otherPlayer, currentBet):
 # player1 and player2 are Player objects
 # 
 def playHighCardCvC(player1, player2):
-    #print("new game against new players")
+    print("new game against new players")
     turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
     blindMultiplier = 1
     player1Big = True
@@ -278,7 +278,7 @@ def playHighCardCvC(player1, player2):
     bigBlind = SMALL_BLIND_AMOUNT * blindMultiplier
 
     while(player1.getMoney() > 0 and player2.getMoney() > 0):
-        #print("player1 ", player1.getMoney(), " player2: ", player2.getMoney())
+        print("player1 ", player1.getMoney(), " player2: ", player2.getMoney())
         if turnsUntilBlind == 0:
             blindMultiplier *= 2
             turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
@@ -297,7 +297,7 @@ def playHighCardCvC(player1, player2):
             player2.setMoney(result[1])
             player1Big = True
 
-        #print(result)
+        print(result)
         turnsUntilBlind -= 1
 
 
@@ -314,13 +314,12 @@ def playHand(smallBlind, bigBlind, blindAmount):
     dealCard(smallBlind)
     dealCard(bigBlind)
     pot = 0
-    #print("\n\nNew Hand: SB:", smallBlind.getMoney(), " BB:", bigBlind.getMoney())
-    #print(blindAmount, 2 * blindAmount)
-
+    print("\n\nNew Hand: SB:", smallBlind.getMoney(), " BB:", bigBlind.getMoney())
+    print(blindAmount, 2 * blindAmount)
     # small blind player has less than small blind amount, so just have poorest player
     #   shove and the other matches. No betting since one player has shoved.
     if smallBlind.getMoney() <= blindAmount or bigBlind.getMoney() <= 2 * blindAmount:
-        #print("we have only a few chips left")
+        print("we have only a few chips left")
         chipsIn = min(smallBlind.getMoney(), bigBlind.getMoney())
         
         pot += insertBlind(smallBlind, chipsIn)
@@ -329,14 +328,14 @@ def playHand(smallBlind, bigBlind, blindAmount):
         winner = getWinner(smallBlind, bigBlind)
 
         if winner == 0:
-            #print("Chop! ", pot/2)
-            awardMoney(smallBlind, pot//2)
-            awardMoney(bigBlind, pot//2)
+            print("Chop! ", pot/2)
+            awardMoney(smallBlind, pot/2)
+            awardMoney(bigBlind, pot/2)
         elif winner == 1:
-            #print("small blind wins", pot)
+            print("small blind wins", pot)
             awardMoney(smallBlind, pot)
         else:
-            #print("big blind wins", pot)
+            print("big blind wins", pot)
             awardMoney(bigBlind, pot)
         
         resetPot(smallBlind, bigBlind)
@@ -357,7 +356,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
             if action == 0: # smallBlind's turn
                 decisions = botAction(smallBlind, betSize)
                 myDecision = getFirstValidAction(smallBlind, decisions, betSize)
-                #print(myDecision[0], myDecision[1], "smallBlind")
+                print(myDecision[0], myDecision[1], "smallBlind")
                 if myDecision[0] == "Fold":
                     bigBlindWin = True
 
@@ -365,7 +364,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
                 elif myDecision[0] == "Call":
                     # must refund
                     callAmount = myDecision[1]
-                    #print(callAmount)
+                    print(callAmount)
                     
                     
                     pot = 2 * callAmount
@@ -410,14 +409,14 @@ def playHand(smallBlind, bigBlind, blindAmount):
             else: # bigBlind's turn
                 decisions = botAction(bigBlind, betSize)
                 myDecision = getFirstValidAction(bigBlind, decisions, betSize)
-                #print(myDecision[0], myDecision[1], "bigBlind")
+                print(myDecision[0], myDecision[1], "bigBlind")
                 if myDecision[0] == "Fold":
                     smallBlindWin = True
                     break
                 
                 elif myDecision[0] == "Call":
                     callAmount = myDecision[1]
-                    #print("callAmount", callAmount)
+                    print("callAmount", callAmount)
 
                     pot = 2 * callAmount
                     bigBlind.setMoney(bigBlind.getMoney() - callAmount + bigBlind.getMoneyInPot())
@@ -447,7 +446,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
 
                     pot += raiseAmount - bigBlind.getMoneyInPot()
                     bigBlind.setMoney(bigBlind.getMoney() - raiseAmount + bigBlind.getMoneyInPot())
-                    #print (bigBlind.getMoney())
+                    print (bigBlind.getMoney())
                     betSize = raiseAmount #+ bigBlind.getMoneyInPot()
                     bigBlind.setMoneyInPot(raiseAmount)
                                       
@@ -460,25 +459,25 @@ def playHand(smallBlind, bigBlind, blindAmount):
 
 
         if smallBlindWin:
-            #print("small blind wins:", pot)
+            print("small blind wins:", pot)
             awardMoney(smallBlind, pot)
         elif bigBlindWin:
-            #print("bigBlind wins:", pot)
+            print("bigBlind wins:", pot)
             awardMoney(bigBlind, pot)
         else:
             winner = getWinner(smallBlind, bigBlind)
 
             if winner == 0:
-                #print("chop!", pot/2)
-                awardMoney(smallBlind, pot//2)
-                awardMoney(bigBlind, pot//2)
+                print("chop!", pot/2)
+                awardMoney(smallBlind, pot/2)
+                awardMoney(bigBlind, pot/2)
             elif winner == 1:
-                #print("small blind wins:", pot)
+                print("small blind wins:", pot)
                 awardMoney(smallBlind, pot)
             else:
-                #print("big blind wins:", pot)
+                print("big blind wins:", pot)
                 awardMoney(bigBlind, pot)
-        #print(smallBlind.getMoney(), bigBlind.getMoney())
+        print(smallBlind.getMoney(), bigBlind.getMoney())
         resetPot(smallBlind, bigBlind)
         
         if smallBlind.getMoney() < 0 or bigBlind.getMoney() < 0:
@@ -556,21 +555,21 @@ def getFirstValidAction(player, actions, betSize):
             if player.getMoney() + player.getMoneyInPot() < 2 * betSize:
                 #print("made it to continue")
                 continue
-            #print("minRaise")
+            print("minRaise")
             return ("Raise", betSize * 2)
         elif possibleAction == 3: # higherRaise: will only return if the raise amount is possible
             if player.getMoney() + player.getMoneyInPot() < 5 * betSize:
                 #print("made it to continue")
                 continue
-            #print("5x raise")
+            print("5x raise")
             return ("Raise", 5 * betSize)
         else: # shove: put all remaining chips into the pot: if money < betSize: counts as call          
             if player.getMoney() + player.getMoneyInPot() < betSize:
-                #print("shoving with less than or equal to bet")
+                print("shoving with less than or equal to bet")
                 return ("Special Call", player.getMoney())
             elif player.getMoney() + player.getMoneyInPot() - betSize == 0:
                 return("Call", betSize)
-            #print("shove raise")
+            print("shove raise")
             return ("Raise", player.getMoney() + player.getMoneyInPot()) 
     
     raise Exception("All actions were invalid.")                    
@@ -602,8 +601,6 @@ def playTournament(players):
 
 
 NUM_PLAYERS = 10
-MUTATION_STRENGTH = 1
-MUTATION_CHANCE = 1
 def main():
     gen1Players = [None] * NUM_PLAYERS
 
@@ -616,26 +613,7 @@ def main():
         #print(winners[i].getNeuralNet().getWeights())
         print(winners[i].toString())
 
-    genNumber = 2
-    newGenPlayers = gen1Players
 
-    currElement = 0
-    
-    # get the top half of neural nets and perform crossover and mutation
-    for i in range(0, NUM_PLAYERS//2, 2):
-        weights1 = winners[i].getNeuralNet().getWeights()
-        weights2 = winners[i + 1].getNeuralNet().getWeights()
 
-        newWeights = avgCrossover(weights1, weights2)
-        newWeights = randomMutation(newWeights, MUTATION_STRENGTH/genNumber, MUTATION_CHANCE/genNumber)
-
-        myNet = NeuralNetwork().to("cpu")
-        myNet.changeWeights(newWeights)
-
-        newGenPlayers[currElement] = Player(None, None, STARTING_CASH, myNet)
-        currElement += 1 
-
-    while currElement < len(newGenPlayers):
-        newGenPlayers[currElement] = Player(None, None, STARTING_CASH, NeuralNetwork().to("cpu"))
 if __name__ == "__main__":
     main()

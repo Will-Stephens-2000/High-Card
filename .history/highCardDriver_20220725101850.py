@@ -270,7 +270,7 @@ def action(decidingPlayer, otherPlayer, currentBet):
 # player1 and player2 are Player objects
 # 
 def playHighCardCvC(player1, player2):
-    #print("new game against new players")
+    print("new game against new players")
     turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
     blindMultiplier = 1
     player1Big = True
@@ -278,7 +278,7 @@ def playHighCardCvC(player1, player2):
     bigBlind = SMALL_BLIND_AMOUNT * blindMultiplier
 
     while(player1.getMoney() > 0 and player2.getMoney() > 0):
-        #print("player1 ", player1.getMoney(), " player2: ", player2.getMoney())
+        print("player1 ", player1.getMoney(), " player2: ", player2.getMoney())
         if turnsUntilBlind == 0:
             blindMultiplier *= 2
             turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
@@ -297,7 +297,7 @@ def playHighCardCvC(player1, player2):
             player2.setMoney(result[1])
             player1Big = True
 
-        #print(result)
+        print(result)
         turnsUntilBlind -= 1
 
 
@@ -478,7 +478,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
             else:
                 #print("big blind wins:", pot)
                 awardMoney(bigBlind, pot)
-        #print(smallBlind.getMoney(), bigBlind.getMoney())
+        print(smallBlind.getMoney(), bigBlind.getMoney())
         resetPot(smallBlind, bigBlind)
         
         if smallBlind.getMoney() < 0 or bigBlind.getMoney() < 0:
@@ -601,9 +601,7 @@ def playTournament(players):
 
 
 
-NUM_PLAYERS = 10
-MUTATION_STRENGTH = 1
-MUTATION_CHANCE = 1
+NUM_PLAYERS = 100
 def main():
     gen1Players = [None] * NUM_PLAYERS
 
@@ -616,26 +614,7 @@ def main():
         #print(winners[i].getNeuralNet().getWeights())
         print(winners[i].toString())
 
-    genNumber = 2
-    newGenPlayers = gen1Players
 
-    currElement = 0
-    
-    # get the top half of neural nets and perform crossover and mutation
-    for i in range(0, NUM_PLAYERS//2, 2):
-        weights1 = winners[i].getNeuralNet().getWeights()
-        weights2 = winners[i + 1].getNeuralNet().getWeights()
 
-        newWeights = avgCrossover(weights1, weights2)
-        newWeights = randomMutation(newWeights, MUTATION_STRENGTH/genNumber, MUTATION_CHANCE/genNumber)
-
-        myNet = NeuralNetwork().to("cpu")
-        myNet.changeWeights(newWeights)
-
-        newGenPlayers[currElement] = Player(None, None, STARTING_CASH, myNet)
-        currElement += 1 
-
-    while currElement < len(newGenPlayers):
-        newGenPlayers[currElement] = Player(None, None, STARTING_CASH, NeuralNetwork().to("cpu"))
 if __name__ == "__main__":
     main()

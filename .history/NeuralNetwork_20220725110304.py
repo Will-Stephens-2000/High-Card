@@ -33,11 +33,6 @@ class NeuralNetwork(nn.Module):
         logits = self.linear_relu_stack(x)
         return logits
 
-    
-    def setWeights(self, newWeights):
-        for key in list(newWeights.keys()):
-            self.state_dict()[key] = newWeights[key]
-
 
     # Method which returns an ordered dictionary containing
     # all weights with their cooresponding key values representing 
@@ -45,7 +40,10 @@ class NeuralNetwork(nn.Module):
     def getWeights(self):
         return self.state_dict()
 
-
+    def initWeights(self, newWeights):
+        
+        for key in list(newWeights.keys()):
+            self.state_dict()[key] = newWeights[key]
 
 
 
