@@ -602,8 +602,6 @@ def playTournament(players):
 
 
 NUM_PLAYERS = 10
-MUTATION_STRENGTH = 1
-MUTATION_CHANCE = 1
 def main():
     gen1Players = [None] * NUM_PLAYERS
 
@@ -616,26 +614,7 @@ def main():
         #print(winners[i].getNeuralNet().getWeights())
         print(winners[i].toString())
 
-    genNumber = 2
-    newGenPlayers = gen1Players
 
-    currElement = 0
-    
-    # get the top half of neural nets and perform crossover and mutation
-    for i in range(0, NUM_PLAYERS//2, 2):
-        weights1 = winners[i].getNeuralNet().getWeights()
-        weights2 = winners[i + 1].getNeuralNet().getWeights()
 
-        newWeights = avgCrossover(weights1, weights2)
-        newWeights = randomMutation(newWeights, MUTATION_STRENGTH/genNumber, MUTATION_CHANCE/genNumber)
-
-        myNet = NeuralNetwork().to("cpu")
-        myNet.changeWeights(newWeights)
-
-        newGenPlayers[currElement] = Player(None, None, STARTING_CASH, myNet)
-        currElement += 1 
-
-    while currElement < len(newGenPlayers):
-        newGenPlayers[currElement] = Player(None, None, STARTING_CASH, NeuralNetwork().to("cpu"))
 if __name__ == "__main__":
     main()
