@@ -3,7 +3,7 @@ from Player import *
 from NeuralNetwork import *
 
 SMALL_BLIND_AMOUNT = 20
-TURNS_FOR_BLIND_INCREASE = 20
+TURNS_FOR_BLIND_INCREASE = 5
 
 
 def playHighCard(player1, player2):
@@ -613,10 +613,10 @@ def playAgainstFirstGen(challenger, gen1):
     return numWins
 
 
-NUM_PLAYERS = 50
-NUM_GENERATIONS = 25
-MUTATION_STRENGTH = 1
-MUTATION_CHANCE = .9
+NUM_PLAYERS = 30
+NUM_GENERATIONS = 20
+MUTATION_STRENGTH = 5
+MUTATION_CHANCE = 1
 def main():
     gen1Players = [None] * NUM_PLAYERS
 
@@ -640,11 +640,9 @@ def main():
 
 
         currElement = 0
-        print("Generation #" + str(genNumber+1))
+        print("gen Number", genNumber+1)
         # get the top half of neural nets and perform crossover and mutation
         for i in range(0, NUM_PLAYERS//2):
-            if currElement >= len(newGenPlayers):
-                break
             #print("crossover ", i)
             weights1 = winners[i].getNeuralNet().getWeights()
             weights2 = winners[i + 1].getNeuralNet().getWeights()
@@ -664,18 +662,10 @@ def main():
     
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("A", "H"), 40, 980)
     for i in range(0, len(bestPerformers)):
         winNumbers[i] = playAgainstFirstGen(bestPerformers[i], gen1Players)
-        
-        model = bestPerformers[i].getNeuralNet()
-        logits = model(aceInput.float())
-        prob = nn.Softmax(dim=1)(logits)
-        print(prob)
-
+    
     print(winNumbers)
-
-
 
 if __name__ == "__main__":
     main()

@@ -61,34 +61,20 @@ class NeuralNetwork(nn.Module):
 def avgCrossover(weights1, weights2):
     finalDict = {}
     for key in sorted(weights1.keys()):
-        #print(key)
-        #print(weights1[key].size())
-        tensor1 = weights1[key].tolist()
-        tensor2 = weights2[key].tolist()
-        
-        #print(tensor1)
-        
-        biasWeights = isinstance(tensor1[0], float)
+        tensor1 = weights1[key]
+        tensor2 = weights2[key]
+        print(tensor1)
+        cols = len(tensor1[0])
+        rows = len(tensor1)
+        mutatedTensor = [[0]*cols for _ in range(rows)]
 
-        if biasWeights:
-            mutatedTensor = [0] * len(tensor1)
-            for i in range(len(mutatedTensor)):
-                w1 = tensor1[i]
-                w2 = tensor2[i]
-                mutatedTensor[i] = (w1 + w2)/2
-        else:
-            
-            cols = len(tensor1[0])
-            rows = len(tensor1)
-            mutatedTensor = [[0]*cols for _ in range(rows)]
+        for i in range(rows):
+            for j in range(cols):
+                w1 = tensor1[i][j]
+                w2 = tensor2[i][j]
+                mutatedTensor[i][j] = (w1 + w2)/2
 
-            for i in range(rows):
-                for j in range(cols):
-                    w1 = tensor1[i][j]
-                    w2 = tensor2[i][j]
-                    mutatedTensor[i][j] = (w1 + w2)/2
-
-        finalDict[key] = torch.FloatTensor(mutatedTensor)
+        finalDict[key] = mutatedTensor
     
     return finalDict
 
@@ -102,33 +88,20 @@ def randomMutation(weightDict, mutStr, mutChance):
     finalDict = {}
 
     for key in sorted(weightDict.keys()):
+        currTensor = weightDict[key]
+        mutatedTensor = [[0]*cols for _ in range(rows)]
 
-        tensor = weightDict[key].tolist()
-        biasWeights = isinstance(tensor[0], float)
-        
-        if biasWeights:
-            mutatedTensor = [0] * len(tensor)
-            for i in range(len(tensor)):
-                if random.random() < mutChance:
+        cols = len(mutatedTensor[0])
+        rows = len(mutatedTensor)
+        for i in range (rows):
+            for j in range(cols):
+                if random.random() <= mutChance:
                     mutAmount = random.uniform(-1, 1) * mutStr
-                    newWeight = tensor[i] + mutAmount
+                    newWeight = currTensor[i][j] + mutAmount
                     
-                    mutatedTensor[i] = newWeight
-        
-        else:
-            cols = len(tensor[0])
-            rows = len(tensor)
-            mutatedTensor = [[0]*cols for _ in range(rows)]
+                    mutatedTensor[i][j] = newWeight
 
-            for i in range (rows):
-                for j in range(cols):
-                    if random.random() < mutChance:
-                        mutAmount = random.uniform(-1, 1) * mutStr
-                        newWeight = tensor[i][j] + mutAmount
-                        
-                        mutatedTensor[i][j] = newWeight
-
-        finalDict[key] = torch.FloatTensor(mutatedTensor)
+        finalDict[key] = mutatedTensor
     
     return finalDict
 

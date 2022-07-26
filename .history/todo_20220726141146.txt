@@ -1,0 +1,6 @@
+Basic stuff is working, now I just need to make the network actually learn
+
+Why does it reach a generation with a high win rate against gen1 (~83%) and then immediately drop to ~50% next gen1 
+    This occurs both at low generations and high generations
+
+

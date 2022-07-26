@@ -109,7 +109,7 @@ def randomMutation(weightDict, mutStr, mutChance):
         if biasWeights:
             mutatedTensor = [0] * len(tensor)
             for i in range(len(tensor)):
-                if random.random() < mutChance:
+                if random.random() <= mutChance:
                     mutAmount = random.uniform(-1, 1) * mutStr
                     newWeight = tensor[i] + mutAmount
                     
@@ -119,10 +119,10 @@ def randomMutation(weightDict, mutStr, mutChance):
             cols = len(tensor[0])
             rows = len(tensor)
             mutatedTensor = [[0]*cols for _ in range(rows)]
-
+            
             for i in range (rows):
                 for j in range(cols):
-                    if random.random() < mutChance:
+                    if random.random() <= mutChance:
                         mutAmount = random.uniform(-1, 1) * mutStr
                         newWeight = tensor[i][j] + mutAmount
                         

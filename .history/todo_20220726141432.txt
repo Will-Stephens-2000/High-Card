@@ -13,7 +13,3 @@ Stuff to think about:
     are crossover and mutation methods actually producing effective offspring
         are there other ways to crossover and mutate which have a more subtle effective
             I am currently crossing over every weight. Should i have a random chance for a node to be crossovered? 
-
-
-    should I be changing each weight, or only the input weights
-    should be a single layer neural net

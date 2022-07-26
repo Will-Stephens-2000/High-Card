@@ -613,10 +613,10 @@ def playAgainstFirstGen(challenger, gen1):
     return numWins
 
 
-NUM_PLAYERS = 50
-NUM_GENERATIONS = 25
-MUTATION_STRENGTH = 1
-MUTATION_CHANCE = .9
+NUM_PLAYERS = 5
+NUM_GENERATIONS = 2
+MUTATION_STRENGTH = 2
+MUTATION_CHANCE = .8
 def main():
     gen1Players = [None] * NUM_PLAYERS
 
@@ -664,12 +664,13 @@ def main():
     
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("A", "H"), 40, 980)
+    aceInput = createInputs(Card("A", "H"), float(.1), float(.5))
     for i in range(0, len(bestPerformers)):
         winNumbers[i] = playAgainstFirstGen(bestPerformers[i], gen1Players)
         
         model = bestPerformers[i].getNeuralNet()
-        logits = model(aceInput.float())
+        print(aceInput)
+        logits = model(aceInput)
         prob = nn.Softmax(dim=1)(logits)
         print(prob)
 
