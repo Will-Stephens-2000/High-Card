@@ -102,33 +102,20 @@ def randomMutation(weightDict, mutStr, mutChance):
     finalDict = {}
 
     for key in sorted(weightDict.keys()):
+        currTensor = weightDict[key]
+        mutatedTensor = [[0]*cols for _ in range(rows)]
 
-        tensor = weightDict[key].tolist()
-        biasWeights = isinstance(tensor[0], float)
-        
-        if biasWeights:
-            mutatedTensor = [0] * len(tensor)
-            for i in range(len(tensor)):
-                if random.random() < mutChance:
+        cols = len(mutatedTensor[0])
+        rows = len(mutatedTensor)
+        for i in range (rows):
+            for j in range(cols):
+                if random.random() <= mutChance:
                     mutAmount = random.uniform(-1, 1) * mutStr
-                    newWeight = tensor[i] + mutAmount
+                    newWeight = currTensor[i][j] + mutAmount
                     
-                    mutatedTensor[i] = newWeight
-        
-        else:
-            cols = len(tensor[0])
-            rows = len(tensor)
-            mutatedTensor = [[0]*cols for _ in range(rows)]
+                    mutatedTensor[i][j] = newWeight
 
-            for i in range (rows):
-                for j in range(cols):
-                    if random.random() < mutChance:
-                        mutAmount = random.uniform(-1, 1) * mutStr
-                        newWeight = tensor[i][j] + mutAmount
-                        
-                        mutatedTensor[i][j] = newWeight
-
-        finalDict[key] = torch.FloatTensor(mutatedTensor)
+        finalDict[key] = mutatedTensor
     
     return finalDict
 

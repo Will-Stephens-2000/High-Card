@@ -61,12 +61,12 @@ class NeuralNetwork(nn.Module):
 def avgCrossover(weights1, weights2):
     finalDict = {}
     for key in sorted(weights1.keys()):
-        #print(key)
-        #print(weights1[key].size())
+        print(key)
+        print(weights1[key].size())
         tensor1 = weights1[key].tolist()
         tensor2 = weights2[key].tolist()
         
-        #print(tensor1)
+        print(tensor1)
         
         biasWeights = isinstance(tensor1[0], float)
 
@@ -102,33 +102,20 @@ def randomMutation(weightDict, mutStr, mutChance):
     finalDict = {}
 
     for key in sorted(weightDict.keys()):
+        currTensor = weightDict[key]
+        mutatedTensor = [[0]*cols for _ in range(rows)]
 
-        tensor = weightDict[key].tolist()
-        biasWeights = isinstance(tensor[0], float)
-        
-        if biasWeights:
-            mutatedTensor = [0] * len(tensor)
-            for i in range(len(tensor)):
-                if random.random() < mutChance:
+        cols = len(mutatedTensor[0])
+        rows = len(mutatedTensor)
+        for i in range (rows):
+            for j in range(cols):
+                if random.random() <= mutChance:
                     mutAmount = random.uniform(-1, 1) * mutStr
-                    newWeight = tensor[i] + mutAmount
+                    newWeight = currTensor[i][j] + mutAmount
                     
-                    mutatedTensor[i] = newWeight
-        
-        else:
-            cols = len(tensor[0])
-            rows = len(tensor)
-            mutatedTensor = [[0]*cols for _ in range(rows)]
+                    mutatedTensor[i][j] = newWeight
 
-            for i in range (rows):
-                for j in range(cols):
-                    if random.random() < mutChance:
-                        mutAmount = random.uniform(-1, 1) * mutStr
-                        newWeight = tensor[i][j] + mutAmount
-                        
-                        mutatedTensor[i][j] = newWeight
-
-        finalDict[key] = torch.FloatTensor(mutatedTensor)
+        finalDict[key] = mutatedTensor
     
     return finalDict
 

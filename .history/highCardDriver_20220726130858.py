@@ -3,7 +3,7 @@ from Player import *
 from NeuralNetwork import *
 
 SMALL_BLIND_AMOUNT = 20
-TURNS_FOR_BLIND_INCREASE = 20
+TURNS_FOR_BLIND_INCREASE = 5
 
 
 def playHighCard(player1, player2):
@@ -603,8 +603,6 @@ def playTournament(players):
 def playAgainstFirstGen(challenger, gen1):
     numWins = 0
     for player in gen1:
-        challenger.setMoney(STARTING_CASH)
-        player.setMoney(STARTING_CASH)
         winner = playHighCardCvC(challenger, player)
 
         if winner == challenger:
@@ -613,10 +611,10 @@ def playAgainstFirstGen(challenger, gen1):
     return numWins
 
 
-NUM_PLAYERS = 50
-NUM_GENERATIONS = 25
+NUM_PLAYERS = 10
+NUM_GENERATIONS = 10
 MUTATION_STRENGTH = 1
-MUTATION_CHANCE = .9
+MUTATION_CHANCE = 1
 def main():
     gen1Players = [None] * NUM_PLAYERS
 
@@ -640,42 +638,29 @@ def main():
 
 
         currElement = 0
-        print("Generation #" + str(genNumber+1))
         # get the top half of neural nets and perform crossover and mutation
-        for i in range(0, NUM_PLAYERS//2):
-            if currElement >= len(newGenPlayers):
-                break
-            #print("crossover ", i)
+        for i in range(0, NUM_PLAYERS//2, 2):
             weights1 = winners[i].getNeuralNet().getWeights()
             weights2 = winners[i + 1].getNeuralNet().getWeights()
 
             newWeights = avgCrossover(weights1, weights2)
-            newWeights = randomMutation(newWeights, MUTATION_STRENGTH/(genNumber+1), MUTATION_CHANCE/(genNumber+1))
+            newWeights = randomMutation(newWeights, MUTATION_STRENGTH/genNumber, MUTATION_CHANCE/genNumber)
 
             myNet = NeuralNetwork().to("cpu")
-            myNet.setWeights(newWeights)
+            myNet.changeWeights(newWeights)
 
             newGenPlayers[currElement] = Player(None, None, STARTING_CASH, myNet)
             currElement += 1 
 
         while currElement < len(newGenPlayers):
             newGenPlayers[currElement] = Player(None, None, STARTING_CASH, NeuralNetwork().to("cpu"))
-            currElement += 1
     
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("A", "H"), 40, 980)
     for i in range(0, len(bestPerformers)):
         winNumbers[i] = playAgainstFirstGen(bestPerformers[i], gen1Players)
-        
-        model = bestPerformers[i].getNeuralNet()
-        logits = model(aceInput.float())
-        prob = nn.Softmax(dim=1)(logits)
-        print(prob)
-
+    
     print(winNumbers)
-
-
 
 if __name__ == "__main__":
     main()
