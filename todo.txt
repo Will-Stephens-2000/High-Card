@@ -16,4 +16,12 @@ Stuff to think about:
 
 
     should I be changing each weight, or only the input weights
-    should be a single layer neural net
+    should there be only a single layer neural net
+
+    choose fewer parents
+        like 4 instead of half the population
+        random chance to crossover each weight in this case
+
+
+    Maybe need many more generations to make it work well
+        confidence is not changing a lot
