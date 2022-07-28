@@ -5,8 +5,8 @@ from torch import nn
 from Card import *
 from Player import *
 
-NUM_INPUTS = 1 # 13 card ranks plus currBet and myChips as input
-NUM_HIDDEN = 5 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
+NUM_INPUTS = 3 # 13 card ranks plus currBet and myChips as input
+NUM_HIDDEN = 7 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
 NUM_OUTPUTS = 5 # 5 outputs: fold, call minRaise, higherRaise, shove
 
 
@@ -147,7 +147,7 @@ def randomMutation(weightDict, mutStr, mutChance):
                     
                     mutAmount = random.uniform(-1, 1) * mutStr
                     newWeight = tensor[i] + mutAmount
-                    #print(tensor[i], newWeight)
+                    print(tensor[i], newWeight)
                     
                     mutatedTensor[i] = newWeight
         
@@ -173,7 +173,7 @@ def randomMutation(weightDict, mutStr, mutChance):
 CROSSOVER_METHOD = randomCrossover
 MUTATION_METHOD = randomMutation
 
-MUTATION_STRENGTH = 3
+MUTATION_STRENGTH = 5
 MUTATION_CHANCE = .25
 NUM_PARENTS = 4
 def generateNewGeneration(players, genNumber):
@@ -221,12 +221,12 @@ def createInputs(card, betSize, myChips):
     inputs[0][0] = float(rank/14)
 
     #total = float(myChips + betSize)
-    # if myChips == 0:
-    #     inputs[0][1] = 1
-    # else:
-    #     inputs[0][1] = min(float(betSize/myChips), 1.) # current bet
+    if myChips == 0:
+        inputs[0][1] = 1
+    else:
+        inputs[0][1] = min(float(betSize/myChips), 1.) # current bet
     
-    # inputs[0][2] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
+    inputs[0][2] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
 
     #print(inputs)
     return torch.from_numpy(inputs)

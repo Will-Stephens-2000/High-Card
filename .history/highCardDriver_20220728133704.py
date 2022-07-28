@@ -601,7 +601,7 @@ def playTournament(players):
             else:
                 players[j].incrementWins()
 
-    return sorted(players, key = lambda x:x.numWins, reverse=True)
+    return sorted(players, key = lambda x:x.numShoves)#, reverse=True)
 
 
 def playAgainstFirstGen(challenger, gen1):
@@ -645,11 +645,11 @@ def main():
         if genNumber == 0:
             continue
         bestPerformers[genNumber-1] = winners[0] # put best performing player in bestPerformers[generation number - 1]
-        print("times Shoved: ", winners[0].getShoves())
+        
         
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("2", "H"), 1000, 500)
+    aceInput = createInputs(Card("2", "H"), 980, 980)
     for i in range(0, len(bestPerformers)):
         winNumbers[i] = round(playAgainstFirstGen(bestPerformers[i], gen1Players)/NUM_PLAYERS, 2)
         

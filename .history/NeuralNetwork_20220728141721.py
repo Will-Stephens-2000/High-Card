@@ -173,7 +173,7 @@ def randomMutation(weightDict, mutStr, mutChance):
 CROSSOVER_METHOD = randomCrossover
 MUTATION_METHOD = randomMutation
 
-MUTATION_STRENGTH = 3
+MUTATION_STRENGTH = 1
 MUTATION_CHANCE = .25
 NUM_PARENTS = 4
 def generateNewGeneration(players, genNumber):

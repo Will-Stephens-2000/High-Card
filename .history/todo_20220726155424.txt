@@ -1,0 +1,23 @@
+Basic stuff is working, now I just need to make the network actually learn
+
+Why does it reach a generation with a high win rate against gen1 (~83%) and then immediately drop to ~50% next gen1 
+    This occurs both at low generations and high generations
+
+
+Win rate does not seem to be consistantly increasing, but is pretty random.
+    We are usually not getting worse than the best gen1 player, but typically not much better in most cases.
+
+
+Stuff to think about:
+    are we mutating too much/ to strongly 
+    are crossover and mutation methods actually producing effective offspring
+        are there other ways to crossover and mutate which have a more subtle effective
+            I am currently crossing over every weight. Should i have a random chance for a node to be crossovered? 
+
+
+    should I be changing each weight, or only the input weights
+    should there be only a single layer neural net
+
+    choose fewer parents
+        like 4 instead of half the population
+        random chance to crossover each weight in this case

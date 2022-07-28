@@ -6,7 +6,7 @@ from Card import *
 from Player import *
 
 NUM_INPUTS = 1 # 13 card ranks plus currBet and myChips as input
-NUM_HIDDEN = 5 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
+NUM_HIDDEN = 7 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
 NUM_OUTPUTS = 5 # 5 outputs: fold, call minRaise, higherRaise, shove
 
 
@@ -147,7 +147,7 @@ def randomMutation(weightDict, mutStr, mutChance):
                     
                     mutAmount = random.uniform(-1, 1) * mutStr
                     newWeight = tensor[i] + mutAmount
-                    #print(tensor[i], newWeight)
+                    print(tensor[i], newWeight)
                     
                     mutatedTensor[i] = newWeight
         
@@ -173,7 +173,7 @@ def randomMutation(weightDict, mutStr, mutChance):
 CROSSOVER_METHOD = randomCrossover
 MUTATION_METHOD = randomMutation
 
-MUTATION_STRENGTH = 3
+MUTATION_STRENGTH = 1
 MUTATION_CHANCE = .25
 NUM_PARENTS = 4
 def generateNewGeneration(players, genNumber):
