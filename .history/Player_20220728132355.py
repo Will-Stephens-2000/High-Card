@@ -34,13 +34,8 @@ class Player:
     def incrementShoves(self):
         self.numShoves += 1
     
-    def getShoves(self):
-        return self.numShoves
-        
     def resetShoves(self):
         self.numShoves = 0
-
-        
     def setNeuralNet(self, neuralNet):
         self.neuralNet = neuralNet
 

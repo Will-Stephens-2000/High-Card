@@ -31,15 +31,6 @@ class Player:
     def resetWins(self):
         self.numWins = 0
 
-    def incrementShoves(self):
-        self.numShoves += 1
-    
-    def getShoves(self):
-        return self.numShoves
-        
-    def resetShoves(self):
-        self.numShoves = 0
-
         
     def setNeuralNet(self, neuralNet):
         self.neuralNet = neuralNet
@@ -64,7 +55,6 @@ class Player:
 
     def getNeuralNet(self):
         return self.neuralNet
-
 
 # Method which deals a card to a player.
 def dealCard(player):

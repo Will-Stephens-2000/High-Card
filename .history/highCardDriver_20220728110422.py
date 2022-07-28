@@ -3,7 +3,7 @@ from Player import *
 from NeuralNetwork import *
 
 SMALL_BLIND_AMOUNT = 20
-TURNS_FOR_BLIND_INCREASE = 50
+TURNS_FOR_BLIND_INCREASE = 20
 
 
 def playHighCard(player1, player2):
@@ -566,10 +566,8 @@ def getFirstValidAction(player, actions, betSize):
             #print("5x raise")
             return ("Raise", 5 * betSize)
         else: # shove: put all remaining chips into the pot: if money < betSize: counts as call          
-            player.incrementShoves()
             if player.getMoney() + player.getMoneyInPot() < betSize:
                 #print("shoving with less than or equal to bet")
-                
                 return ("Special Call", player.getMoney())
             elif player.getMoney() + player.getMoneyInPot() - betSize == 0:
                 return("Call", betSize)
@@ -606,7 +604,7 @@ def playTournament(players):
 
 def playAgainstFirstGen(challenger, gen1):
     numWins = 0
-    #print("testing against first gen")
+    print("testing against first gen")
     for player in gen1:
         challenger.setMoney(STARTING_CASH)
         player.setMoney(STARTING_CASH)
@@ -618,8 +616,8 @@ def playAgainstFirstGen(challenger, gen1):
     return numWins
 
 
-NUM_PLAYERS = 30
-NUM_GENERATIONS = 10
+NUM_PLAYERS = 10
+NUM_GENERATIONS = 5
 
 def main():
     gen1Players = [None] * NUM_PLAYERS
@@ -642,16 +640,16 @@ def main():
 
         winners = playTournament(newGenPlayers)
         newGenPlayers = generateNewGeneration(winners, genNumber+1)
-        if genNumber == 0:
+        if (genNumber == 0):
             continue
         bestPerformers[genNumber-1] = winners[0] # put best performing player in bestPerformers[generation number - 1]
-        print("times Shoved: ", winners[0].getShoves())
+        
         
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("2", "H"), 1000, 500)
+    aceInput = createInputs(Card("A", "H"), 40, 980)
     for i in range(0, len(bestPerformers)):
-        winNumbers[i] = round(playAgainstFirstGen(bestPerformers[i], gen1Players)/NUM_PLAYERS, 2)
+        winNumbers[i] = playAgainstFirstGen(bestPerformers[i], gen1Players)
         
         model = bestPerformers[i].getNeuralNet()
         logits = model(aceInput.float())
@@ -663,5 +661,4 @@ def main():
 
 
 if __name__ == "__main__":
-    with torch.no_grad():
-        main()
+    main()

@@ -633,7 +633,7 @@ def main():
     #     #print(winners[i].getNeuralNet().getWeights())
     #     print(winners[i].toString())
 
-    bestPerformers = [None] * (NUM_GENERATIONS-1)
+    bestPerformers = [None] * (NUM_GENERATIONS)
     
 
     newGenPlayers = gen1Players
@@ -642,14 +642,13 @@ def main():
 
         winners = playTournament(newGenPlayers)
         newGenPlayers = generateNewGeneration(winners, genNumber+1)
-        if genNumber == 0:
-            continue
-        bestPerformers[genNumber-1] = winners[0] # put best performing player in bestPerformers[generation number - 1]
-        print("times Shoved: ", winners[0].getShoves())
+
+        bestPerformers[genNumber] = winners[0] # put best performing player in bestPerformers[generation number - 1]
+        
         
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("2", "H"), 1000, 500)
+    aceInput = createInputs(Card("2", "H"), 980, 980)
     for i in range(0, len(bestPerformers)):
         winNumbers[i] = round(playAgainstFirstGen(bestPerformers[i], gen1Players)/NUM_PLAYERS, 2)
         

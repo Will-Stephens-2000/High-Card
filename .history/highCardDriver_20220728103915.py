@@ -3,7 +3,7 @@ from Player import *
 from NeuralNetwork import *
 
 SMALL_BLIND_AMOUNT = 20
-TURNS_FOR_BLIND_INCREASE = 50
+TURNS_FOR_BLIND_INCREASE = 20
 
 
 def playHighCard(player1, player2):
@@ -270,7 +270,7 @@ def action(decidingPlayer, otherPlayer, currentBet):
 # player1 and player2 are Player objects
 # 
 def playHighCardCvC(player1, player2):
-    #print("new game against new players")
+    print("new game against new players")
     turnsUntilBlind = TURNS_FOR_BLIND_INCREASE
     blindMultiplier = 1
     player1Big = True
@@ -314,9 +314,9 @@ def playHand(smallBlind, bigBlind, blindAmount):
     dealCard(smallBlind)
     dealCard(bigBlind)
     pot = 0
-    #print("\n\nNew Hand: SB:", smallBlind.getMoney(), " BB:", bigBlind.getMoney())
+    print("\n\nNew Hand: SB:", smallBlind.getMoney(), " BB:", bigBlind.getMoney())
     #print(blindAmount, 2 * blindAmount)
-    
+
     # small blind player has less than small blind amount, so just have poorest player
     #   shove and the other matches. No betting since one player has shoved.
     if smallBlind.getMoney() <= blindAmount or bigBlind.getMoney() <= 2 * blindAmount:
@@ -342,7 +342,6 @@ def playHand(smallBlind, bigBlind, blindAmount):
         resetPot(smallBlind, bigBlind)
         return (smallBlind.getMoney(), bigBlind.getMoney())
     else:
-        #print(smallBlind, bigBlind)
         pot += insertBlind(smallBlind, blindAmount)
         pot += insertBlind(bigBlind, 2 * blindAmount)
         #print("players' money after blinds:", smallBlind.getMoney(), bigBlind.getMoney())
@@ -358,7 +357,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
             if action == 0: # smallBlind's turn
                 decisions = botAction(smallBlind, betSize)
                 myDecision = getFirstValidAction(smallBlind, decisions, betSize)
-                #print(myDecision[0], myDecision[1], "smallBlind")
+                print(myDecision[0], myDecision[1], "smallBlind")
                 if myDecision[0] == "Fold":
                     bigBlindWin = True
 
@@ -399,19 +398,19 @@ def playHand(smallBlind, bigBlind, blindAmount):
                     raiseAmount = myDecision[1]
 
                     pot += raiseAmount - smallBlind.getMoneyInPot()
-                    #print("pot", pot)
+                    print(pot)
                     smallBlind.setMoney(smallBlind.getMoney() - raiseAmount + smallBlind.getMoneyInPot())
-                    #print("SB", smallBlind.getMoney())
+                    print(smallBlind.getMoney())
                     betSize = raiseAmount #+ smallBlind.getMoneyInPot() # commented out the + smallBlind... etc
-                    #print("betSize", betSize)
+                    print(betSize)
                     smallBlind.setMoneyInPot(raiseAmount)
-                    #print("SB moneyInPot", smallBlind.getMoneyInPot())
+                    print(smallBlind.getMoneyInPot())
                     action = 1
 
             else: # bigBlind's turn
                 decisions = botAction(bigBlind, betSize)
                 myDecision = getFirstValidAction(bigBlind, decisions, betSize)
-                #print(myDecision[0], myDecision[1], "bigBlind")
+                print(myDecision[0], myDecision[1], "bigBlind")
                 if myDecision[0] == "Fold":
                     smallBlindWin = True
                     break
@@ -470,9 +469,13 @@ def playHand(smallBlind, bigBlind, blindAmount):
             winner = getWinner(smallBlind, bigBlind)
 
             if winner == 0:
-                #print("chop!", pot)
+                print("chop!", pot)
+                print(smallBlind.getMoney(), bigBlind.getMoney())
+                print(smallBlind.getMoneyInPot(), bigBlind.getMoneyInPot())
                 awardMoney(smallBlind, pot//2)
                 awardMoney(bigBlind, pot//2)
+                print(smallBlind.getMoney(), bigBlind.getMoney())
+                print(smallBlind.getMoneyInPot(), bigBlind.getMoneyInPot())
             elif winner == 1:
                 #print("small blind wins:", pot)
                 awardMoney(smallBlind, pot)
@@ -566,14 +569,12 @@ def getFirstValidAction(player, actions, betSize):
             #print("5x raise")
             return ("Raise", 5 * betSize)
         else: # shove: put all remaining chips into the pot: if money < betSize: counts as call          
-            player.incrementShoves()
             if player.getMoney() + player.getMoneyInPot() < betSize:
                 #print("shoving with less than or equal to bet")
-                
                 return ("Special Call", player.getMoney())
             elif player.getMoney() + player.getMoneyInPot() - betSize == 0:
                 return("Call", betSize)
-            #print("shove raise")
+            print("shove raise")
             #print(player.getMoneyInPot())
             return ("Raise", player.getMoney() + player.getMoneyInPot()) 
     
@@ -606,7 +607,7 @@ def playTournament(players):
 
 def playAgainstFirstGen(challenger, gen1):
     numWins = 0
-    #print("testing against first gen")
+    print("testing against first gen")
     for player in gen1:
         challenger.setMoney(STARTING_CASH)
         player.setMoney(STARTING_CASH)
@@ -618,8 +619,8 @@ def playAgainstFirstGen(challenger, gen1):
     return numWins
 
 
-NUM_PLAYERS = 30
-NUM_GENERATIONS = 10
+NUM_PLAYERS = 5
+NUM_GENERATIONS = 1
 
 def main():
     gen1Players = [None] * NUM_PLAYERS
@@ -633,7 +634,7 @@ def main():
     #     #print(winners[i].getNeuralNet().getWeights())
     #     print(winners[i].toString())
 
-    bestPerformers = [None] * (NUM_GENERATIONS-1)
+    bestPerformers = [None] * NUM_GENERATIONS
     
 
     newGenPlayers = gen1Players
@@ -641,17 +642,14 @@ def main():
         print("Generation #" + str(genNumber+1))
 
         winners = playTournament(newGenPlayers)
-        newGenPlayers = generateNewGeneration(winners, genNumber+1)
-        if genNumber == 0:
-            continue
-        bestPerformers[genNumber-1] = winners[0] # put best performing player in bestPerformers[generation number - 1]
-        print("times Shoved: ", winners[0].getShoves())
+        bestPerformers[genNumber] = winners[0] # put best performing player in bestPerformers[generation number - 1]
         
+        newGenPlayers = generateNewGeneration(winners, genNumber+1)
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("2", "H"), 1000, 500)
+    aceInput = createInputs(Card("A", "H"), 40, 980)
     for i in range(0, len(bestPerformers)):
-        winNumbers[i] = round(playAgainstFirstGen(bestPerformers[i], gen1Players)/NUM_PLAYERS, 2)
+        winNumbers[i] = playAgainstFirstGen(bestPerformers[i], gen1Players)
         
         model = bestPerformers[i].getNeuralNet()
         logits = model(aceInput.float())
@@ -663,5 +661,4 @@ def main():
 
 
 if __name__ == "__main__":
-    with torch.no_grad():
-        main()
+    main()

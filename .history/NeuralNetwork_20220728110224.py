@@ -5,8 +5,8 @@ from torch import nn
 from Card import *
 from Player import *
 
-NUM_INPUTS = 1 # 13 card ranks plus currBet and myChips as input
-NUM_HIDDEN = 5 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
+NUM_INPUTS = 15 # 13 card ranks plus currBet and myChips as input
+NUM_HIDDEN = 15 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
 NUM_OUTPUTS = 5 # 5 outputs: fold, call minRaise, higherRaise, shove
 
 
@@ -23,8 +23,8 @@ class NeuralNetwork(nn.Module):
             
             nn.Linear(NUM_INPUTS, NUM_HIDDEN),
             nn.ReLU(),
-            # nn.Linear(NUM_HIDDEN, NUM_HIDDEN),
-            # nn.ReLU(),
+            nn.Linear(NUM_HIDDEN, NUM_HIDDEN),
+            nn.ReLU(),
             nn.Linear(NUM_HIDDEN, NUM_OUTPUTS), 
         )
 
@@ -92,8 +92,6 @@ def avgCrossover(weights1, weights2):
     
     return finalDict
 
-
-CROSSOVER_CHANCE = .5
 # Crossover method which randomly chooses a neuralNet for each weight
 # Odds are hard coded at .5
 def randomCrossover(weights1, weights2):
@@ -111,7 +109,7 @@ def randomCrossover(weights1, weights2):
         if biasWeights:
             mutatedTensor = [0] * len(tensor1)
             for i in range(len(mutatedTensor)):
-                mutatedTensor[i] = tensor1[i] if random.random() <= CROSSOVER_CHANCE else tensor2[i]
+                mutatedTensor[i] = tensor1[i] if random.random() <= .5 else tensor2[i]
         else:
             
             cols = len(tensor1[0])
@@ -120,7 +118,7 @@ def randomCrossover(weights1, weights2):
 
             for i in range(rows):
                 for j in range(cols):
-                    mutatedTensor[i][j] = tensor1[i][j] if random.random() <= CROSSOVER_CHANCE else tensor2[i][j]
+                    mutatedTensor[i][j] = tensor1[i][j] if random.random() <= .5 else tensor2[i][j]
 
         finalDict[key] = torch.FloatTensor(mutatedTensor)
     
@@ -144,10 +142,8 @@ def randomMutation(weightDict, mutStr, mutChance):
             mutatedTensor = [0] * len(tensor)
             for i in range(len(tensor)):
                 if random.random() < mutChance:
-                    
                     mutAmount = random.uniform(-1, 1) * mutStr
                     newWeight = tensor[i] + mutAmount
-                    #print(tensor[i], newWeight)
                     
                     mutatedTensor[i] = newWeight
         
@@ -159,7 +155,7 @@ def randomMutation(weightDict, mutStr, mutChance):
             for i in range (rows):
                 for j in range(cols):
                     if random.random() < mutChance:
-                        mutAmount = random.uniform(0, 1) * mutStr
+                        mutAmount = random.uniform(-1, 1) * mutStr
                         newWeight = tensor[i][j] + mutAmount
                         
                         mutatedTensor[i][j] = newWeight
@@ -173,8 +169,8 @@ def randomMutation(weightDict, mutStr, mutChance):
 CROSSOVER_METHOD = randomCrossover
 MUTATION_METHOD = randomMutation
 
-MUTATION_STRENGTH = 3
-MUTATION_CHANCE = .25
+MUTATION_STRENGTH = 1
+MUTATION_CHANCE = .9
 NUM_PARENTS = 4
 def generateNewGeneration(players, genNumber):
     newGen = [None] * len(players)
@@ -183,7 +179,7 @@ def generateNewGeneration(players, genNumber):
     bestPlayers = players[0:NUM_PARENTS]
 
     for i in range(0, NUM_PARENTS):
-        weights = bestPlayers[i].getNeuralNet().getWeights()
+        weights = bestPlayers[i].getNeuralNet.getWeights()
         newNet = NeuralNetwork().to("cpu")
         newNet.setWeights(weights)
 
@@ -197,7 +193,7 @@ def generateNewGeneration(players, genNumber):
         weights2 = currentParents[1].getNeuralNet().getWeights()
 
         newWeights = CROSSOVER_METHOD(weights1, weights2)
-        newWeights = MUTATION_METHOD(newWeights, MUTATION_STRENGTH/(genNumber), MUTATION_CHANCE/genNumber)
+        newWeights = MUTATION_METHOD(newWeights, MUTATION_STRENGTH/genNumber, MUTATION_CHANCE/genNumber)
 
         myNet = NeuralNetwork().to("cpu")
         myNet.setWeights(newWeights)
@@ -218,15 +214,15 @@ def createInputs(card, betSize, myChips):
     
     #inputs[0] => rank = 2
     #inputs[12] => rank = 14 = A 
-    inputs[0][0] = float(rank/14)
+    inputs[0][rank-2] = float(1.)
 
     #total = float(myChips + betSize)
-    # if myChips == 0:
-    #     inputs[0][1] = 1
-    # else:
-    #     inputs[0][1] = min(float(betSize/myChips), 1.) # current bet
+    if myChips == 0:
+        inputs[0][13] = 1
+    else:
+        inputs[0][13] = min(float(betSize/myChips), 1.) # current bet
     
-    # inputs[0][2] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
+    inputs[0][14] = min(float(.5 * (myChips/STARTING_CASH)), 1.) # myChips
 
     #print(inputs)
     return torch.from_numpy(inputs)

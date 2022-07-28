@@ -601,7 +601,7 @@ def playTournament(players):
             else:
                 players[j].incrementWins()
 
-    return sorted(players, key = lambda x:x.numWins, reverse=True)
+    return sorted(players, key = lambda x:x.numShoves)#, reverse=True)
 
 
 def playAgainstFirstGen(challenger, gen1):
