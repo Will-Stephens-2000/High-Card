@@ -1,7 +1,6 @@
 from Card import *
 from Player import *
 from NeuralNetwork import *
-from graphing import *
 
 SMALL_BLIND_AMOUNT = 20
 TURNS_FOR_BLIND_INCREASE = 50
@@ -358,7 +357,7 @@ def playHand(smallBlind, bigBlind, blindAmount):
         while action != -1:
             if action == 0: # smallBlind's turn
                 decisions = botAction(smallBlind, betSize)
-                myDecision = getRandomAction(smallBlind, decisions, betSize)
+                myDecision = getFirstValidAction(smallBlind, decisions, betSize)
                 #print(myDecision[0], myDecision[1], "smallBlind")
                 if myDecision[0] == "Fold":
                     bigBlindWin = True
@@ -580,52 +579,7 @@ def getFirstValidAction(player, actions, betSize):
     
     raise Exception("All actions were invalid.")                    
 
-def getRandomAction(player, actions, betSize):
-    #print(actions)
-    prefixSum = [0] * len(actions[0])
-    prefixSum[0] = actions[0][0].item()
 
-    for i in range(1, len(actions[0])):
-        prefixSum[i] = prefixSum[i-1] + actions[0][i].item()
-    
-    #print(prefixSum)
-    while True:
-        possibleAction = random.random()
-
-        if possibleAction <= prefixSum[0]:
-            return ("Fold", 0)
-        
-        elif possibleAction <= prefixSum[1]:
-            if player.getMoney() + player.getMoneyInPot() < betSize:
-                return ("Special Call", player.getMoney())            
-            return ("Call", betSize)
-
-        elif possibleAction <= prefixSum[2]:
-            if player.getMoney() + player.getMoneyInPot() < 2 * betSize:
-                #print("made it to continue")
-                continue
-            #print("minRaise")
-            return ("Raise", betSize * 2)
-        
-        elif possibleAction <= prefixSum[3]:
-            if player.getMoney() + player.getMoneyInPot() < 5 * betSize:
-                #print("made it to continue")
-                continue
-            #print("5x raise")
-            return ("Raise", 5 * betSize)
-        else:
-            player.incrementShoves()
-            if player.getMoney() + player.getMoneyInPot() < betSize:
-                #print("shoving with less than or equal to bet")
-                
-                return ("Special Call", player.getMoney())
-            elif player.getMoney() + player.getMoneyInPot() - betSize == 0:
-                return("Call", betSize)
-            #print("shove raise")
-            #print(player.getMoneyInPot())
-            return ("Raise", player.getMoney() + player.getMoneyInPot()) 
-
-    
 # Plays a Round Robin bracket for each neural net.
 # Tracks the number of wins for each neural net.
 # Returns a list of neural nets sorted from most to least winning nets.
@@ -665,7 +619,7 @@ def playAgainstFirstGen(challenger, gen1):
 
 
 NUM_PLAYERS = 100
-NUM_GENERATIONS = 20
+NUM_GENERATIONS = 500
 
 def main():
     gen1Players = [None] * NUM_PLAYERS
@@ -695,7 +649,7 @@ def main():
         
     
     winNumbers = [0] * len(bestPerformers)
-    aceInput = createInputs(Card("A", "H"), 1000, 500)
+    aceInput = createInputs(Card("2", "H"), 1000, 500)
     for i in range(0, len(bestPerformers)):
         winNumbers[i] = round(playAgainstFirstGen(bestPerformers[i], gen1Players)/NUM_PLAYERS, 2)
         
@@ -706,7 +660,7 @@ def main():
 
     print(winNumbers)
 
-    plotWinRate(winNumbers)
+
 
 if __name__ == "__main__":
     with torch.no_grad():

@@ -1,7 +1,6 @@
 from Card import *
 from Player import *
 from NeuralNetwork import *
-from graphing import *
 
 SMALL_BLIND_AMOUNT = 20
 TURNS_FOR_BLIND_INCREASE = 50
@@ -664,8 +663,8 @@ def playAgainstFirstGen(challenger, gen1):
     return numWins
 
 
-NUM_PLAYERS = 100
-NUM_GENERATIONS = 20
+NUM_PLAYERS = 50
+NUM_GENERATIONS = 30
 
 def main():
     gen1Players = [None] * NUM_PLAYERS
@@ -706,7 +705,7 @@ def main():
 
     print(winNumbers)
 
-    plotWinRate(winNumbers)
+
 
 if __name__ == "__main__":
     with torch.no_grad():

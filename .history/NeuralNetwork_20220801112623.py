@@ -5,8 +5,8 @@ from torch import nn
 from Card import *
 from Player import *
 
-NUM_INPUTS = 3 # 13 card ranks plus currBet and myChips as input
-NUM_HIDDEN = 10 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
+NUM_INPUTS = 1 # 13 card ranks plus currBet and myChips as input
+NUM_HIDDEN = 5 # hyperparameter: chosen currently as 2/3 * NUM_INPUTS + NUM_OUTPUTS
 NUM_OUTPUTS = 5 # 5 outputs: fold, call minRaise, higherRaise, shove
 
 
@@ -173,7 +173,7 @@ def randomMutation(weightDict, mutStr, mutChance):
 CROSSOVER_METHOD = randomCrossover
 MUTATION_METHOD = randomMutation
 
-MUTATION_STRENGTH = 3
+MUTATION_STRENGTH = 1
 MUTATION_CHANCE = .25
 NUM_PARENTS = 4
 def generateNewGeneration(players, genNumber):
@@ -197,7 +197,7 @@ def generateNewGeneration(players, genNumber):
         weights2 = currentParents[1].getNeuralNet().getWeights()
 
         newWeights = CROSSOVER_METHOD(weights1, weights2)
-        newWeights = MUTATION_METHOD(newWeights, MUTATION_STRENGTH/(genNumber**.5), MUTATION_CHANCE/(genNumber**.5))
+        newWeights = MUTATION_METHOD(newWeights, MUTATION_STRENGTH/(genNumber**.5), MUTATION_CHANCE/genNumber)
 
         myNet = NeuralNetwork().to("cpu")
         myNet.setWeights(newWeights)
