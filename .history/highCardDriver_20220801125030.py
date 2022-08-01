@@ -665,7 +665,7 @@ def playAgainstFirstGen(challenger, gen1):
 
 
 NUM_PLAYERS = 100
-NUM_GENERATIONS = 20
+NUM_GENERATIONS = 5
 
 def main():
     gen1Players = [None] * NUM_PLAYERS
